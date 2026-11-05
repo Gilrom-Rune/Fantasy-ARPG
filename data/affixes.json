@@ -1,0 +1,224 @@
+[
+	{
+		"id": "life", "type": "prefix", "name": "Hale",
+		"text": "+{0} to maximum Life",
+		"slots": ["helmet", "body", "boots", "ring"],
+		"mods": [{"stat": "life", "kind": "flat"}],
+		"tiers": [
+			{"ilvl": 1, "values": [[8, 15]]},
+			{"ilvl": 6, "values": [[16, 28]]},
+			{"ilvl": 12, "values": [[29, 45]]},
+			{"ilvl": 20, "values": [[46, 65]]}
+		]
+	},
+	{
+		"id": "mana", "type": "prefix", "name": "Azure",
+		"text": "+{0} to maximum Mana",
+		"slots": ["weapon", "helmet", "body", "ring"],
+		"mods": [{"stat": "mana", "kind": "flat"}],
+		"tiers": [
+			{"ilvl": 1, "values": [[8, 14]]},
+			{"ilvl": 7, "values": [[15, 25]]},
+			{"ilvl": 15, "values": [[26, 40]]}
+		]
+	},
+	{
+		"id": "armour", "type": "prefix", "name": "Plated",
+		"text": "+{0} to Armour",
+		"slots": ["helmet", "body", "boots"],
+		"mods": [{"stat": "armour", "kind": "flat"}],
+		"tiers": [
+			{"ilvl": 1, "values": [[15, 30]]},
+			{"ilvl": 8, "values": [[31, 70]]},
+			{"ilvl": 16, "values": [[71, 130]]}
+		]
+	},
+	{
+		"id": "added_phys", "type": "prefix", "name": "Jagged",
+		"text": "Adds {0} to {1} Physical Damage to Attacks",
+		"slots": ["weapon", "ring"],
+		"mods": [
+			{"stat": "added_physical_min", "kind": "flat", "tags": ["attack"]},
+			{"stat": "added_physical_max", "kind": "flat", "tags": ["attack"]}
+		],
+		"tiers": [
+			{"ilvl": 1, "values": [[1, 3], [4, 6]]},
+			{"ilvl": 8, "values": [[4, 7], [8, 13]]},
+			{"ilvl": 16, "values": [[8, 12], [14, 22]]}
+		]
+	},
+	{
+		"id": "added_fire_attack", "type": "prefix", "name": "Smouldering",
+		"text": "Adds {0} to {1} Fire Damage to Attacks",
+		"slots": ["weapon", "ring"],
+		"mods": [
+			{"stat": "added_fire_min", "kind": "flat", "tags": ["attack"]},
+			{"stat": "added_fire_max", "kind": "flat", "tags": ["attack"]}
+		],
+		"tiers": [
+			{"ilvl": 1, "values": [[1, 3], [4, 7]]},
+			{"ilvl": 10, "values": [[5, 9], [10, 16]]}
+		]
+	},
+	{
+		"id": "added_cold_spell", "type": "prefix", "name": "Frosted",
+		"text": "Adds {0} to {1} Cold Damage to Spells",
+		"slots": ["weapon"],
+		"mods": [
+			{"stat": "added_cold_min", "kind": "flat", "tags": ["spell"]},
+			{"stat": "added_cold_max", "kind": "flat", "tags": ["spell"]}
+		],
+		"tiers": [
+			{"ilvl": 1, "values": [[1, 2], [3, 5]]},
+			{"ilvl": 10, "values": [[3, 6], [7, 11]]}
+		]
+	},
+	{
+		"id": "added_lightning_spell", "type": "prefix", "name": "Humming",
+		"text": "Adds {0} to {1} Lightning Damage to Spells",
+		"slots": ["weapon"],
+		"mods": [
+			{"stat": "added_lightning_min", "kind": "flat", "tags": ["spell"]},
+			{"stat": "added_lightning_max", "kind": "flat", "tags": ["spell"]}
+		],
+		"tiers": [
+			{"ilvl": 1, "values": [[1, 1], [4, 8]]},
+			{"ilvl": 10, "values": [[1, 3], [10, 18]]}
+		]
+	},
+	{
+		"id": "phys_damage", "type": "prefix", "name": "Heavy",
+		"text": "{0}% increased Physical Damage",
+		"slots": ["weapon"],
+		"mods": [{"stat": "damage", "kind": "increased", "tags": ["physical"]}],
+		"tiers": [
+			{"ilvl": 1, "values": [[15, 30]]},
+			{"ilvl": 9, "values": [[31, 55]]},
+			{"ilvl": 18, "values": [[56, 85]]}
+		]
+	},
+	{
+		"id": "spell_damage", "type": "prefix", "name": "Mystic",
+		"text": "{0}% increased Spell Damage",
+		"slots": ["weapon"],
+		"mods": [{"stat": "damage", "kind": "increased", "tags": ["spell"]}],
+		"tiers": [
+			{"ilvl": 1, "values": [[12, 25]]},
+			{"ilvl": 9, "values": [[26, 45]]},
+			{"ilvl": 18, "values": [[46, 70]]}
+		]
+	},
+	{
+		"id": "elemental_damage", "type": "suffix", "name": "of the Elements",
+		"text": "{0}% increased Elemental Damage",
+		"slots": ["weapon", "ring", "helmet"],
+		"mods": [{"stat": "damage", "kind": "increased", "tags": ["elemental"]}],
+		"tiers": [
+			{"ilvl": 1, "values": [[8, 15]]},
+			{"ilvl": 10, "values": [[16, 28]]}
+		]
+	},
+	{
+		"id": "fire_res", "type": "suffix", "name": "of the Hearth",
+		"text": "+{0}% to Fire Resistance",
+		"slots": ["helmet", "body", "boots", "ring"],
+		"mods": [{"stat": "fire_res", "kind": "flat"}],
+		"tiers": [
+			{"ilvl": 1, "values": [[8, 15]]},
+			{"ilvl": 8, "values": [[16, 28]]},
+			{"ilvl": 16, "values": [[29, 40]]}
+		]
+	},
+	{
+		"id": "cold_res", "type": "suffix", "name": "of the Seal",
+		"text": "+{0}% to Cold Resistance",
+		"slots": ["helmet", "body", "boots", "ring"],
+		"mods": [{"stat": "cold_res", "kind": "flat"}],
+		"tiers": [
+			{"ilvl": 1, "values": [[8, 15]]},
+			{"ilvl": 8, "values": [[16, 28]]},
+			{"ilvl": 16, "values": [[29, 40]]}
+		]
+	},
+	{
+		"id": "lightning_res", "type": "suffix", "name": "of Grounding",
+		"text": "+{0}% to Lightning Resistance",
+		"slots": ["helmet", "body", "boots", "ring"],
+		"mods": [{"stat": "lightning_res", "kind": "flat"}],
+		"tiers": [
+			{"ilvl": 1, "values": [[8, 15]]},
+			{"ilvl": 8, "values": [[16, 28]]},
+			{"ilvl": 16, "values": [[29, 40]]}
+		]
+	},
+	{
+		"id": "attack_speed", "type": "suffix", "name": "of Haste",
+		"text": "{0}% increased Attack Speed",
+		"slots": ["weapon", "ring"],
+		"mods": [{"stat": "attack_speed", "kind": "increased"}],
+		"tiers": [
+			{"ilvl": 1, "values": [[5, 9]]},
+			{"ilvl": 10, "values": [[10, 16]]}
+		]
+	},
+	{
+		"id": "cast_speed", "type": "suffix", "name": "of Talent",
+		"text": "{0}% increased Cast Speed",
+		"slots": ["weapon", "ring"],
+		"mods": [{"stat": "cast_speed", "kind": "increased"}],
+		"tiers": [
+			{"ilvl": 1, "values": [[5, 9]]},
+			{"ilvl": 10, "values": [[10, 16]]}
+		]
+	},
+	{
+		"id": "crit_chance", "type": "suffix", "name": "of Precision",
+		"text": "{0}% increased Critical Hit Chance",
+		"slots": ["weapon", "ring", "helmet"],
+		"mods": [{"stat": "crit_chance", "kind": "increased"}],
+		"tiers": [
+			{"ilvl": 1, "values": [[10, 19]]},
+			{"ilvl": 10, "values": [[20, 35]]}
+		]
+	},
+	{
+		"id": "move_speed", "type": "suffix", "name": "of the Fox",
+		"text": "{0}% increased Movement Speed",
+		"slots": ["boots"],
+		"mods": [{"stat": "move_speed", "kind": "increased"}],
+		"tiers": [
+			{"ilvl": 1, "values": [[5, 10]]},
+			{"ilvl": 10, "values": [[11, 20]]}
+		]
+	},
+	{
+		"id": "mana_regen", "type": "suffix", "name": "of the Spring",
+		"text": "{0}% increased Mana Regeneration Rate",
+		"slots": ["weapon", "helmet", "ring"],
+		"mods": [{"stat": "mana_regen", "kind": "increased"}],
+		"tiers": [
+			{"ilvl": 1, "values": [[15, 30]]},
+			{"ilvl": 10, "values": [[31, 55]]}
+		]
+	},
+	{
+		"id": "life_regen", "type": "suffix", "name": "of Mending",
+		"text": "Regenerate {0} Life per second",
+		"slots": ["helmet", "body", "ring"],
+		"mods": [{"stat": "life_regen", "kind": "flat"}],
+		"tiers": [
+			{"ilvl": 1, "values": [[1, 2]]},
+			{"ilvl": 10, "values": [[3, 5]]}
+		]
+	},
+	{
+		"id": "area", "type": "suffix", "name": "of Expanse",
+		"text": "{0}% increased Area of Effect",
+		"slots": ["helmet", "ring"],
+		"mods": [{"stat": "area", "kind": "increased"}],
+		"tiers": [
+			{"ilvl": 1, "values": [[6, 10]]},
+			{"ilvl": 10, "values": [[11, 18]]}
+		]
+	}
+]

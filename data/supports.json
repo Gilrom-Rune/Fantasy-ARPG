@@ -1,0 +1,141 @@
+{
+	"multishot": {
+		"name": "Multishot",
+		"description": "Fires 2 additional projectiles. 30% less damage. 40% more mana cost.",
+		"requires": ["projectile"],
+		"mods": [
+			{"stat": "projectiles", "kind": "flat", "value": 2},
+			{"stat": "damage", "kind": "more", "value": -30},
+			{"stat": "mana_cost", "kind": "more", "value": 40}
+		]
+	},
+	"chain": {
+		"name": "Chain",
+		"description": "Projectiles chain to 2 additional enemies. 20% less damage.",
+		"requires": ["projectile"],
+		"adds_tags": ["chaining"],
+		"mods": [
+			{"stat": "chains", "kind": "flat", "value": 2},
+			{"stat": "damage", "kind": "more", "value": -20},
+			{"stat": "mana_cost", "kind": "more", "value": 20}
+		]
+	},
+	"pierce": {
+		"name": "Pierce",
+		"description": "Projectiles pierce 2 additional enemies and fly 30% faster.",
+		"requires": ["projectile"],
+		"mods": [
+			{"stat": "pierce", "kind": "flat", "value": 2},
+			{"stat": "projectile_speed", "kind": "increased", "value": 30},
+			{"stat": "mana_cost", "kind": "more", "value": 10}
+		]
+	},
+	"added_fire": {
+		"name": "Added Fire",
+		"description": "Adds 3 to 6 fire damage.",
+		"requires": [],
+		"mods": [
+			{"stat": "added_fire_min", "kind": "flat", "value": 3},
+			{"stat": "added_fire_max", "kind": "flat", "value": 6},
+			{"stat": "mana_cost", "kind": "more", "value": 20}
+		]
+	},
+	"added_cold": {
+		"name": "Added Cold",
+		"description": "Adds 3 to 5 cold damage. Cold damage chills enemies.",
+		"requires": [],
+		"mods": [
+			{"stat": "added_cold_min", "kind": "flat", "value": 3},
+			{"stat": "added_cold_max", "kind": "flat", "value": 5},
+			{"stat": "mana_cost", "kind": "more", "value": 20}
+		]
+	},
+	"added_lightning": {
+		"name": "Added Lightning",
+		"description": "Adds 1 to 10 lightning damage.",
+		"requires": [],
+		"mods": [
+			{"stat": "added_lightning_min", "kind": "flat", "value": 1},
+			{"stat": "added_lightning_max", "kind": "flat", "value": 10},
+			{"stat": "mana_cost", "kind": "more", "value": 20}
+		]
+	},
+	"concentrated": {
+		"name": "Concentrated Effect",
+		"description": "35% more area damage, but 30% less area of effect.",
+		"requires": ["area"],
+		"mods": [
+			{"stat": "damage", "kind": "more", "value": 35},
+			{"stat": "area", "kind": "more", "value": -30},
+			{"stat": "mana_cost", "kind": "more", "value": 30}
+		]
+	},
+	"wide_reach": {
+		"name": "Wide Reach",
+		"description": "50% increased area of effect.",
+		"requires": ["area"],
+		"mods": [
+			{"stat": "area", "kind": "increased", "value": 50},
+			{"stat": "mana_cost", "kind": "more", "value": 20}
+		]
+	},
+	"quickcast": {
+		"name": "Quickcast",
+		"description": "30% more cast speed. 10% less damage.",
+		"requires": ["spell"],
+		"mods": [
+			{"stat": "cast_speed", "kind": "more", "value": 30},
+			{"stat": "damage", "kind": "more", "value": -10},
+			{"stat": "mana_cost", "kind": "more", "value": 20}
+		]
+	},
+	"fury": {
+		"name": "Fury",
+		"description": "25% more attack speed and 15% more attack damage.",
+		"requires": ["attack"],
+		"mods": [
+			{"stat": "attack_speed", "kind": "more", "value": 25},
+			{"stat": "damage", "kind": "more", "value": 15},
+			{"stat": "mana_cost", "kind": "flat", "value": 3}
+		]
+	},
+	"echo": {
+		"name": "Echo",
+		"description": "The skill repeats one additional time. 25% less damage.",
+		"requires": ["spell"],
+		"mods": [
+			{"stat": "repeats", "kind": "flat", "value": 1},
+			{"stat": "damage", "kind": "more", "value": -25},
+			{"stat": "mana_cost", "kind": "more", "value": 50}
+		]
+	},
+	"searing": {
+		"name": "Searing",
+		"description": "+40% chance to ignite. Burning deals 60% more damage.",
+		"requires": ["fire"],
+		"mods": [
+			{"stat": "ignite_chance", "kind": "flat", "value": 40},
+			{"stat": "ailment_damage", "kind": "more", "value": 60},
+			{"stat": "mana_cost", "kind": "more", "value": 15}
+		]
+	},
+	"overcharge": {
+		"name": "Overcharge",
+		"description": "+30% chance to shock. 80% increased critical hit chance.",
+		"requires": ["lightning"],
+		"mods": [
+			{"stat": "shock_chance", "kind": "flat", "value": 30},
+			{"stat": "crit_chance", "kind": "increased", "value": 80},
+			{"stat": "mana_cost", "kind": "more", "value": 15}
+		]
+	},
+	"brutality": {
+		"name": "Brutality",
+		"description": "40% more physical damage.",
+		"requires": ["physical"],
+		"mods": [
+			{"stat": "damage", "kind": "more", "value": 40, "tags": ["physical"]},
+			{"stat": "mana_cost", "kind": "flat", "value": 2}
+		]
+	}
+}

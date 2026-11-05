@@ -1,0 +1,7 @@
+# Godot 4 generated files
+.godot/
+/android/
+
+# OS junk
+.DS_Store
+Thumbs.db
