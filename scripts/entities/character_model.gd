@@ -6,13 +6,18 @@ extends Node3D
 ##  - idle / run / attack / death animations
 ##  - a colour tint used for hit flashes, burning, chill, magic/rare monsters
 
-const BLEND := 0.12
+const BLEND := 0.22          ## seconds to cross-fade between idle and running
+const ACTION_BLEND := 0.1    ## cross-fade into an attack / cast
+const ACTION_EXIT := 0.85    ## return to idle/run when this much of an attack has played
+const TURN_RATE := 16.0      ## how quickly the body turns to a new direction (higher = snappier)
 
 var def: Dictionary
 var anim: AnimationPlayer
 var _overlay: StandardMaterial3D
 var _action_left := 0.0
 var _dead := false
+var _yaw := 0.0
+var _yaw_ready := false
 
 static var _cache := {}
 
@@ -125,12 +130,13 @@ func _build_modular(puppet: Node3D, puppet_skel: Skeleton3D) -> Node3D:
 	puppet.visible = false
 	var retarget := AnimRetarget.new()
 	add_child(retarget)
-	retarget.setup(puppet_skel, body_skel)
+	retarget.setup(puppet_skel, body_skel, def.get("retarget", {}))
 	return body
 
 
 ## Called every physics frame by the actor.
 func update(speed: float, delta: float) -> void:
+	_smooth_turn(delta)
 	if anim == null or _dead:
 		return
 	if _action_left > 0.0:
@@ -144,6 +150,20 @@ func update(speed: float, delta: float) -> void:
 	anim.speed_scale = clampf(speed / float(def.get("run_speed", 5.5)), 0.6, 1.8) if moving else 1.0
 
 
+## The character (gameplay) turns instantly; the visible body eases after it,
+## so turning looks smooth instead of snapping.
+func _smooth_turn(delta: float) -> void:
+	var parent := get_parent() as Node3D
+	if parent == null:
+		return
+	var target := parent.global_rotation.y
+	if not _yaw_ready:
+		_yaw = target
+		_yaw_ready = true
+	_yaw = lerp_angle(_yaw, target, 1.0 - exp(-TURN_RATE * delta))
+	rotation.y = wrapf(_yaw - target, -PI, PI)
+
+
 ## Plays an attack/cast animation squeezed into `duration` seconds.
 func play_action(anim_name: String, duration: float) -> void:
 	if anim == null or _dead or not anim.has_animation(anim_name):
@@ -153,8 +173,8 @@ func play_action(anim_name: String, duration: float) -> void:
 	anim.speed_scale = 1.0
 	if anim.current_animation == anim_name:
 		anim.seek(0.0, true)
-	anim.play(anim_name, 0.06, spd)
-	_action_left = length / spd
+	anim.play(anim_name, ACTION_BLEND, spd)
+	_action_left = length / spd * ACTION_EXIT
 
 
 ## Which animation fits a compiled skill.

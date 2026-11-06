@@ -158,7 +158,11 @@
 			0.0,
 			0.98,
 			0.0
-		]
+		],
+		"retarget": {
+			"arm_down": 25,
+			"finger_curl": 40
+		}
 	},
 	"q_ranger": {
 		"file": "res://assets/characters/Rogue_Hooded.glb",
@@ -206,7 +210,11 @@
 			0.0,
 			0.98,
 			0.0
-		]
+		],
+		"retarget": {
+			"arm_down": 25,
+			"finger_curl": 40
+		}
 	},
 	"q_mage": {
 		"file": "res://assets/characters/Mage.glb",
@@ -252,7 +260,11 @@
 			0.0,
 			0.98,
 			0.0
-		]
+		],
+		"retarget": {
+			"arm_down": 25,
+			"finger_curl": 40
+		}
 	},
 	"q_rogue": {
 		"file": "res://assets/characters/Rogue.glb",
@@ -301,6 +313,10 @@
 			0.0,
 			0.98,
 			0.0
-		]
+		],
+		"retarget": {
+			"arm_down": 25,
+			"finger_curl": 40
+		}
 	}
 }
