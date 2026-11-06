@@ -1,99 +1,202 @@
 {
-	"rusted_sword": {
-		"name": "Rusted Sword", "slot": "weapon", "min_ilvl": 1,
-		"implicit_text": "Adds 4 to 9 Physical Damage to Attacks",
-		"implicit": [
-			{"stat": "added_physical_min", "kind": "flat", "value": 4, "tags": ["attack"]},
-			{"stat": "added_physical_max", "kind": "flat", "value": 9, "tags": ["attack"]}
-		]
-	},
-	"gnarled_wand": {
-		"name": "Gnarled Wand", "slot": "weapon", "min_ilvl": 1,
-		"implicit_text": "15% increased Spell Damage\nAdds 1 to 4 Physical Damage to Attacks",
-		"implicit": [
-			{"stat": "damage", "kind": "increased", "value": 15, "tags": ["spell"]},
-			{"stat": "added_physical_min", "kind": "flat", "value": 1, "tags": ["attack"]},
-			{"stat": "added_physical_max", "kind": "flat", "value": 4, "tags": ["attack"]}
-		]
-	},
-	"war_axe": {
-		"name": "War Axe", "slot": "weapon", "min_ilvl": 6,
-		"implicit_text": "Adds 9 to 18 Physical Damage to Attacks",
-		"implicit": [
-			{"stat": "added_physical_min", "kind": "flat", "value": 9, "tags": ["attack"]},
-			{"stat": "added_physical_max", "kind": "flat", "value": 18, "tags": ["attack"]}
-		]
-	},
-	"runed_sceptre": {
-		"name": "Runed Sceptre", "slot": "weapon", "min_ilvl": 8,
-		"implicit_text": "25% increased Elemental Damage\nAdds 3 to 7 Physical Damage to Attacks",
-		"implicit": [
-			{"stat": "damage", "kind": "increased", "value": 25, "tags": ["elemental"]},
-			{"stat": "added_physical_min", "kind": "flat", "value": 3, "tags": ["attack"]},
-			{"stat": "added_physical_max", "kind": "flat", "value": 7, "tags": ["attack"]}
-		]
-	},
 	"leather_cap": {
-		"name": "Leather Cap", "slot": "helmet", "min_ilvl": 1,
+		"name": "Leather Cap",
+		"slot": "helmet",
+		"min_ilvl": 1,
 		"implicit_text": "+10 to maximum Life",
-		"implicit": [{"stat": "life", "kind": "flat", "value": 10}]
+		"implicit": [
+			{
+				"stat": "life",
+				"kind": "flat",
+				"value": 10
+			}
+		]
 	},
 	"iron_helm": {
-		"name": "Iron Helm", "slot": "helmet", "min_ilvl": 5,
+		"name": "Iron Helm",
+		"slot": "helmet",
+		"min_ilvl": 5,
 		"implicit_text": "+40 to Armour",
-		"implicit": [{"stat": "armour", "kind": "flat", "value": 40}]
+		"implicit": [
+			{
+				"stat": "armour",
+				"kind": "flat",
+				"value": 40
+			}
+		]
 	},
 	"padded_vest": {
-		"name": "Padded Vest", "slot": "body", "min_ilvl": 1,
+		"name": "Padded Vest",
+		"slot": "body",
+		"min_ilvl": 1,
 		"implicit_text": "+20 to maximum Life",
-		"implicit": [{"stat": "life", "kind": "flat", "value": 20}]
+		"implicit": [
+			{
+				"stat": "life",
+				"kind": "flat",
+				"value": 20
+			}
+		]
 	},
 	"chainmail": {
-		"name": "Chainmail", "slot": "body", "min_ilvl": 6,
+		"name": "Chainmail",
+		"slot": "body",
+		"min_ilvl": 6,
 		"implicit_text": "+90 to Armour\n+10 to maximum Life",
 		"implicit": [
-			{"stat": "armour", "kind": "flat", "value": 90},
-			{"stat": "life", "kind": "flat", "value": 10}
+			{
+				"stat": "armour",
+				"kind": "flat",
+				"value": 90
+			},
+			{
+				"stat": "life",
+				"kind": "flat",
+				"value": 10
+			}
 		]
 	},
 	"mystic_robe": {
-		"name": "Mystic Robe", "slot": "body", "min_ilvl": 4,
+		"name": "Mystic Robe",
+		"slot": "body",
+		"min_ilvl": 4,
 		"implicit_text": "+30 to maximum Mana\n20% increased Mana Regeneration Rate",
 		"implicit": [
-			{"stat": "mana", "kind": "flat", "value": 30},
-			{"stat": "mana_regen", "kind": "increased", "value": 20}
+			{
+				"stat": "mana",
+				"kind": "flat",
+				"value": 30
+			},
+			{
+				"stat": "mana_regen",
+				"kind": "increased",
+				"value": 20
+			}
 		]
 	},
 	"leather_boots": {
-		"name": "Leather Boots", "slot": "boots", "min_ilvl": 1,
+		"name": "Leather Boots",
+		"slot": "boots",
+		"min_ilvl": 1,
 		"implicit_text": "+8 to maximum Life",
-		"implicit": [{"stat": "life", "kind": "flat", "value": 8}]
+		"implicit": [
+			{
+				"stat": "life",
+				"kind": "flat",
+				"value": 8
+			}
+		]
 	},
 	"iron_greaves": {
-		"name": "Iron Greaves", "slot": "boots", "min_ilvl": 5,
+		"name": "Iron Greaves",
+		"slot": "boots",
+		"min_ilvl": 5,
 		"implicit_text": "+30 to Armour",
-		"implicit": [{"stat": "armour", "kind": "flat", "value": 30}]
+		"implicit": [
+			{
+				"stat": "armour",
+				"kind": "flat",
+				"value": 30
+			}
+		]
 	},
 	"iron_ring": {
-		"name": "Iron Ring", "slot": "ring", "min_ilvl": 1,
+		"name": "Iron Ring",
+		"slot": "ring",
+		"min_ilvl": 1,
 		"implicit_text": "Adds 1 to 3 Physical Damage to Attacks",
 		"implicit": [
-			{"stat": "added_physical_min", "kind": "flat", "value": 1, "tags": ["attack"]},
-			{"stat": "added_physical_max", "kind": "flat", "value": 3, "tags": ["attack"]}
+			{
+				"stat": "added_physical_min",
+				"kind": "flat",
+				"value": 1,
+				"tags": [
+					"attack"
+				]
+			},
+			{
+				"stat": "added_physical_max",
+				"kind": "flat",
+				"value": 3,
+				"tags": [
+					"attack"
+				]
+			}
 		]
 	},
 	"jade_ring": {
-		"name": "Jade Ring", "slot": "ring", "min_ilvl": 1,
+		"name": "Jade Ring",
+		"slot": "ring",
+		"min_ilvl": 1,
 		"implicit_text": "+15 to maximum Mana",
-		"implicit": [{"stat": "mana", "kind": "flat", "value": 15}]
+		"implicit": [
+			{
+				"stat": "mana",
+				"kind": "flat",
+				"value": 15
+			}
+		]
 	},
 	"prism_ring": {
-		"name": "Prism Ring", "slot": "ring", "min_ilvl": 7,
+		"name": "Prism Ring",
+		"slot": "ring",
+		"min_ilvl": 7,
 		"implicit_text": "+8% to all Elemental Resistances",
 		"implicit": [
-			{"stat": "fire_res", "kind": "flat", "value": 8},
-			{"stat": "cold_res", "kind": "flat", "value": 8},
-			{"stat": "lightning_res", "kind": "flat", "value": 8}
+			{
+				"stat": "fire_res",
+				"kind": "flat",
+				"value": 8
+			},
+			{
+				"stat": "cold_res",
+				"kind": "flat",
+				"value": 8
+			},
+			{
+				"stat": "lightning_res",
+				"kind": "flat",
+				"value": 8
+			}
+		]
+	},
+	"bone_amulet": {
+		"name": "Bone Amulet",
+		"slot": "amulet",
+		"min_ilvl": 1,
+		"implicit_text": "+12 to maximum Life",
+		"implicit": [
+			{
+				"stat": "life",
+				"kind": "flat",
+				"value": 12
+			}
+		]
+	},
+	"lapis_amulet": {
+		"name": "Lapis Amulet",
+		"slot": "amulet",
+		"min_ilvl": 1,
+		"implicit_text": "+20 to maximum Mana",
+		"implicit": [
+			{
+				"stat": "mana",
+				"kind": "flat",
+				"value": 20
+			}
+		]
+	},
+	"amber_amulet": {
+		"name": "Amber Amulet",
+		"slot": "amulet",
+		"min_ilvl": 6,
+		"implicit_text": "10% increased Damage",
+		"implicit": [
+			{
+				"stat": "damage",
+				"kind": "increased",
+				"value": 10
+			}
 		]
 	}
 }

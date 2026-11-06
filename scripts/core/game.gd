@@ -9,6 +9,9 @@ static var area_level := 1
 static var kills := 0
 static var autoplay := false  ## Bot mode used for automated testing (--autoplay).
 
+const CAMP_CENTER := Vector3.ZERO
+const CAMP_RADIUS := 7.0  ## Monsters can't enter the camp.
+
 
 static func reset() -> void:
 	player = null
@@ -39,6 +42,10 @@ static func targets_for(team: int) -> Array:
 	if world == null:
 		return []
 	return world.get_tree().get_nodes_in_group("team_%d" % (1 - team))
+
+
+static func in_camp(pos: Vector3, margin: float = 0.0) -> bool:
+	return flat_distance(pos, CAMP_CENTER) < CAMP_RADIUS + margin
 
 
 static func flat_distance(a: Vector3, b: Vector3) -> float:

@@ -33,6 +33,18 @@ func _draw() -> void:
 		draw_rect(rect, Color(drop.color, 0.6), false, 1.0)
 		draw_string(font, Vector2(rect.position.x + 5, p.y - 1), drop.label, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, drop.color)
 
+	# Chests and the Enchanter's Table
+	for obj in get_tree().get_nodes_in_group("interactables"):
+		var wp: Vector3 = obj.global_position + Vector3(0, 2.2, 0)
+		if cam.is_position_behind(wp):
+			continue
+		var p := cam.unproject_position(wp)
+		var text: String = obj.label
+		var col: Color = obj.label_color
+		var size := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14)
+		draw_string_outline(font, Vector2(p.x - size.x * 0.5, p.y), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, 4, Color(0, 0, 0, 0.85))
+		draw_string(font, Vector2(p.x - size.x * 0.5, p.y), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, col)
+
 	# Enemy health bars and names
 	for e in get_tree().get_nodes_in_group("enemies"):
 		var top: Vector3 = e.global_position + Vector3(0, e.bar_height, 0)

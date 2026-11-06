@@ -1,7 +1,7 @@
 class_name Hud
 extends CanvasLayer
 ## On-screen interface: life/mana/xp bars, skill bar, messages, death screen.
-## Owns the inventory window.
+## Owns the inventory window and the Enchanter's Table window.
 
 signal respawn_requested
 
@@ -10,6 +10,9 @@ var float_texts: Array = []
 
 var overlay: WorldOverlay
 var inventory_ui: InventoryUI
+var enchanter_ui: EnchanterUI
+var prompt_label: Label
+var closed_at_frame := -100  ## so the F that closes the table doesn't reopen it
 var life_bar: ProgressBar
 var mana_bar: ProgressBar
 var xp_bar: ProgressBar
@@ -39,13 +42,17 @@ func setup(p: Player) -> void:
 	inventory_ui.visible = false
 	add_child(inventory_ui)
 	inventory_ui.setup(player)
+	enchanter_ui = EnchanterUI.new()
+	enchanter_ui.visible = false
+	add_child(enchanter_ui)
+	enchanter_ui.setup(player)
 
 
 func _build_top() -> void:
 	info_label = UiUtil.label("", 15)
 	info_label.position = Vector2(16, 12)
 	add_child(info_label)
-	var help := UiUtil.label("WASD move  •  LMB / RMB / Q / E skills  •  I or Tab: inventory & gems", 14, Color(0.7, 0.7, 0.7))
+	var help := UiUtil.label("WASD move  •  LMB RMB Q E 1-6 skills  •  F use  •  I inventory", 14, Color(0.7, 0.7, 0.7))
 	_anchor(help, Vector2(1, 0), Rect2(-620, 12, 604, 20))
 	help.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	add_child(help)
@@ -65,12 +72,19 @@ func _anchor(c: Control, anchor: Vector2, rect: Rect2) -> void:
 
 func _build_bottom() -> void:
 	var root := VBoxContainer.new()
-	_anchor(root, Vector2(0.5, 1), Rect2(-330, -100, 660, 90))
+	_anchor(root, Vector2(0.5, 1), Rect2(-500, -100, 1000, 90))
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
 
+	prompt_label = UiUtil.label("", 18, Color(0.75, 0.9, 1.0))
+	prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	prompt_label.add_theme_constant_override("outline_size", 5)
+	prompt_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+	root.add_child(prompt_label)
+
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 6)
 	root.add_child(row)
 
 	var life_col := VBoxContainer.new()
@@ -82,16 +96,17 @@ func _build_bottom() -> void:
 	life_col.add_child(life_bar)
 	row.add_child(life_col)
 
-	for i in Inventory.SKILL_SLOTS:
+	for i in Weapon.MAX_SLOTS:
 		var panel := PanelContainer.new()
-		panel.custom_minimum_size = Vector2(80, 64)
+		panel.custom_minimum_size = Vector2(66, 64)
 		panel.add_theme_stylebox_override("panel", UiUtil.box(Color(0.08, 0.08, 0.1, 0.92), Color(0.45, 0.4, 0.3), 4, 4))
 		var v := VBoxContainer.new()
 		v.add_theme_constant_override("separation", 0)
 		v.add_child(UiUtil.label(Player.SLOT_KEYS[i], 12, Color(0.95, 0.8, 0.5)))
 		var n := UiUtil.label("", 13)
 		n.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		n.custom_minimum_size = Vector2(72, 0)
+		n.custom_minimum_size = Vector2(58, 0)
+		n.add_theme_font_size_override("font_size", 12)
 		v.add_child(n)
 		var cost := UiUtil.label("", 11, Color(0.55, 0.7, 1.0))
 		v.add_child(cost)
@@ -113,7 +128,7 @@ func _build_bottom() -> void:
 	row.add_child(mana_col)
 
 	xp_bar = UiUtil.bar(Color(0.75, 0.6, 0.2))
-	xp_bar.custom_minimum_size = Vector2(660, 8)
+	xp_bar.custom_minimum_size = Vector2(0, 8)
 	root.add_child(xp_bar)
 
 
@@ -169,19 +184,43 @@ func add_message(text: String, color: Color = Color.WHITE) -> void:
 	tw.tween_callback(l.queue_free)
 
 
+func menu_open() -> bool:
+	return inventory_ui.visible or enchanter_ui.visible
+
+
 func toggle_inventory() -> void:
+	if enchanter_ui.visible:
+		return
 	inventory_ui.visible = not inventory_ui.visible
 	get_tree().paused = inventory_ui.visible
 	if inventory_ui.visible:
 		inventory_ui.refresh()
 
 
+func open_enchanter() -> void:
+	inventory_ui.visible = false
+	enchanter_ui.visible = true
+	get_tree().paused = true
+	enchanter_ui.refresh()
+
+
+func close_menus() -> void:
+	inventory_ui.visible = false
+	enchanter_ui.visible = false
+	enchanter_ui.drag_from = -1
+	get_tree().paused = false
+	closed_at_frame = Engine.get_physics_frames()
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("inventory"):
 		toggle_inventory()
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("ui_cancel") and inventory_ui.visible:
-		toggle_inventory()
+	elif event.is_action_pressed("ui_cancel") and menu_open():
+		close_menus()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("interact") and enchanter_ui.visible:
+		close_menus()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("respawn") and death_panel.visible:
 		respawn_requested.emit()
@@ -202,9 +241,13 @@ func _process(delta: float) -> void:
 	mana_label.text = "Mana %d / %d" % [floori(player.mana), roundi(player.max_mana)]
 	xp_bar.max_value = player.xp_to_next()
 	xp_bar.value = player.xp
-	info_label.text = "Level %d    Area level %d    Kills %d" % [player.level, Game.area_level, Game.kills]
-	for i in Inventory.SKILL_SLOTS:
+	info_label.text = "%s  level %d    Area level %d    Kills %d" % [player.class_name_text(), player.level, Game.area_level, Game.kills]
+	var near: Node3D = null if player.dead else player.nearest_interactable()
+	prompt_label.text = ("[F]  " + String(near.get("label")).replace("  [F]", "")) if near and not menu_open() else ""
+	var open := player.unlocked_slots()
+	for i in Weapon.MAX_SLOTS:
 		var box: Dictionary = skill_boxes[i]
+		box["panel"].visible = i < open
 		var c = player.compiled[i]
 		if c == null:
 			box["name"].text = "-"

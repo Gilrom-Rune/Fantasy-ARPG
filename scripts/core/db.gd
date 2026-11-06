@@ -10,12 +10,13 @@ const ELEMENT_COLORS := {
 	"cold": Color(0.45, 0.82, 1.0),
 	"lightning": Color(1.0, 0.94, 0.35),
 }
-const SLOTS: Array[String] = ["weapon", "helmet", "body", "boots", "ring"]
+const SLOTS: Array[String] = ["helmet", "body", "boots", "ring", "amulet"]
 
 static var skills: Dictionary = {}
 static var supports: Dictionary = {}
 static var bases: Dictionary = {}
 static var affixes: Array = []
+static var classes: Dictionary = {}
 static var _loaded := false
 
 
@@ -26,6 +27,7 @@ static func ensure_loaded() -> void:
 	supports = _load_json("res://data/supports.json", {})
 	bases = _load_json("res://data/item_bases.json", {})
 	affixes = _load_json("res://data/affixes.json", [])
+	classes = _load_json("res://data/classes.json", {})
 	_loaded = true
 
 
@@ -44,6 +46,11 @@ static func _load_json(path: String, fallback: Variant) -> Variant:
 static func skill(id: String) -> Dictionary:
 	ensure_loaded()
 	return skills.get(id, {})
+
+
+static func player_class(id: String) -> Dictionary:
+	ensure_loaded()
+	return classes.get(id, {})
 
 
 static func support(id: String) -> Dictionary:

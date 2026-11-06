@@ -106,17 +106,30 @@ func _think(delta: float) -> void:
 	var dir := to / maxf(dist, 0.001)
 	var keep_away: float = info.get("keep_away", 0.0)
 	if keep_away > 0.0 and dist < keep_away:
-		velocity = -dir * move_speed * action_speed()
-		move_and_slide()
+		_move(-dir, delta)
 		face(dir)
 	elif dist <= info["attack_range"] + p.radius:
 		face(dir)
 		windup = info["windup"]
 		windup_target = p.global_position
 	else:
-		velocity = dir * move_speed * action_speed()
-		move_and_slide()
+		_move(dir, delta)
 		face(dir)
+
+
+## Walks in a direction, but never into the safe camp: at the edge the
+## monster slides around it instead.
+func _move(dir: Vector3, delta: float) -> void:
+	var v := dir * move_speed * action_speed()
+	if Game.in_camp(global_position + v * delta, radius):
+		var out := global_position - Game.CAMP_CENTER
+		out.y = 0
+		var tangent := out.normalized().cross(Vector3.UP)
+		v = tangent * v.dot(tangent)
+		if Game.in_camp(global_position + v * delta, radius):
+			v = Vector3.ZERO
+	velocity = v
+	move_and_slide()
 
 
 func take_hit(hit: Dictionary, source: Actor) -> void:

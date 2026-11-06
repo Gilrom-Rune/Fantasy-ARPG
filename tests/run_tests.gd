@@ -14,6 +14,7 @@ func _init() -> void:
 	test_compiler_supports()
 	test_support_requirements()
 	test_weapon_damage_only_for_attacks()
+	test_weapon_slots_and_chains()
 	test_items()
 	test_inventory_flow()
 	test_data_integrity()
@@ -64,21 +65,19 @@ func _no_crit_avg(c: Dictionary, el: String) -> float:
 
 
 func test_compiler_supports() -> void:
-	print("compiler + supports")
+	print("compiler + passives")
 	var empty := StatBlock.new()
 	var gem := SkillGem.new("fireball", 1)
 	var base := SkillCompiler.compile(gem, empty)
 	check(base["projectiles"] == 1, "fireball has 1 projectile")
 	check(near(_no_crit_avg(base, "fire"), 11.5), "fireball base avg 11.5, got %s" % _no_crit_avg(base, "fire"))
 
-	gem.supports = ["multishot"]
-	var ms := SkillCompiler.compile(gem, empty)
+	var ms := SkillCompiler.compile(gem, empty, ["multishot"])
 	check(ms["projectiles"] == 3, "multishot adds 2 projectiles")
 	check(near(_no_crit_avg(ms, "fire"), 11.5 * 0.7), "multishot 30% less damage")
 	check(ms["mana_cost"] > base["mana_cost"], "multishot costs more mana")
 
-	gem.supports = ["added_cold"]
-	var ac := SkillCompiler.compile(gem, empty)
+	var ac := SkillCompiler.compile(gem, empty, ["added_cold"])
 	check(ac["damage"].has("cold") and ac["chill"], "added cold gives cold damage and chill")
 
 	var lvl5 := SkillCompiler.compile(SkillGem.new("fireball", 5), empty)
@@ -86,32 +85,76 @@ func test_compiler_supports() -> void:
 
 	var nova := SkillGem.new("shock_nova", 1)
 	var n0 := SkillCompiler.compile(nova, empty)
-	nova.supports = ["wide_reach"]
-	var n1 := SkillCompiler.compile(nova, empty)
+	var n1 := SkillCompiler.compile(nova, empty, ["wide_reach"])
 	check(near(n1["radius"], n0["radius"] * sqrt(1.5)), "50% increased area -> radius x sqrt(1.5)")
+
+	var cleave := SkillCompiler.compile(SkillGem.new("cleave", 1), empty, ["multishot", "fury"])
+	check(cleave["ignored"] == ["Multishot"], "passive that doesn't fit is ignored")
+	check(cleave["supports"] == ["Fury"], "passive that fits applies")
 
 
 func test_support_requirements() -> void:
-	print("support requirements")
+	print("passive requirements")
 	var cleave := SkillGem.new("cleave", 1)
-	check(cleave.can_socket("multishot") != "", "multishot rejected on melee skill")
-	check(cleave.can_socket("fury") == "", "fury accepted on attack")
-	check(cleave.can_socket("added_fire") == "", "added fire works on anything")
-	var fb := SkillGem.new("fireball", 1)
-	check(fb.can_socket("fury") != "", "fury rejected on spell")
-	fb.supports = ["chain", "pierce"]
-	check(fb.can_socket("multishot") != "", "level 1 gem has only 2 sockets")
-	check(SkillGem.new("fireball", 9).max_supports() == 5, "level 9 gem has 5 sockets")
+	check(not cleave.fits("multishot"), "multishot rejected on melee skill")
+	check(cleave.fits("fury"), "fury accepted on attack")
+	check(cleave.fits("added_fire"), "added fire works on anything")
+	check(not SkillGem.new("fireball", 1).fits("fury"), "fury rejected on spell")
+	check(SkillGem.new("power_shot", 1).fits("multishot"), "multishot fits bow attack")
 
 
 func test_weapon_damage_only_for_attacks() -> void:
-	print("weapon damage")
-	var s := StatBlock.new()
-	s.add_all(DB.bases["rusted_sword"]["implicit"])
-	var cleave := SkillCompiler.compile(SkillGem.new("cleave", 1), s)
-	var fireball := SkillCompiler.compile(SkillGem.new("fireball", 1), s)
-	check(cleave["damage"]["physical"][1] > 12.0, "sword adds to cleave")
-	check(not fireball["damage"].has("physical"), "sword does not add to fireball")
+	print("class weapons")
+	var w := Weapon.new("warrior")
+	var s1 := StatBlock.new()
+	s1.add_all(w.mods(1))
+	var s20 := StatBlock.new()
+	s20.add_all(w.mods(20))
+	var cleave1 := SkillCompiler.compile(SkillGem.new("cleave", 1), s1)
+	var cleave20 := SkillCompiler.compile(SkillGem.new("cleave", 1), s20)
+	var fireball := SkillCompiler.compile(SkillGem.new("fireball", 1), s1)
+	check(cleave1["damage"]["physical"][1] > 12.0, "greatsword adds to cleave")
+	check(cleave20["damage"]["physical"][1] > cleave1["damage"]["physical"][1] * 2.0, "weapon grows with level")
+	check(not fireball["damage"].has("physical"), "greatsword does not add to fireball")
+	var staff := StatBlock.new()
+	staff.add_all(Weapon.new("mage").mods(1))
+	check(SkillCompiler.compile(SkillGem.new("fireball", 1), staff)["average_hit"] > fireball["average_hit"], "staff boosts spells")
+	for id in DB.classes:
+		check(not Weapon.new(id).describe(10).contains("{"), "weapon text formatted for " + id)
+
+
+func test_weapon_slots_and_chains() -> void:
+	print("weapon slots + soul chains")
+	check(Weapon.unlocked_slots(1) == 1, "1 slot at level 1")
+	check(Weapon.unlocked_slots(9) == 1, "still 1 slot at level 9")
+	check(Weapon.unlocked_slots(10) == 2, "2 slots at level 10")
+	check(Weapon.unlocked_slots(55) == 6, "6 slots at level 55")
+	check(Weapon.unlocked_slots(90) == 10, "10 slots at level 90")
+	check(Weapon.unlocked_slots(100) == 10, "never more than 10 slots")
+	check(Weapon.unlock_level(3) == 30, "slot 4 opens at level 30")
+
+	var w := Weapon.new("mage")
+	w.slots[0]["passive"] = "multishot"
+	w.slots[1]["passive"] = "chain"
+	w.slots[2]["passive"] = "echo"
+	w.slots[3]["passive"] = "searing"
+	check(w.passives_for(0, 10) == ["multishot"], "unchained slot has only its own passive")
+	w.toggle_link(0, 1)
+	check(w.has_link(1, 0), "links are two-way")
+	check(w.passives_for(0, 10) == ["multishot", "chain"], "chained slots share passives")
+	check(w.passives_for(1, 10) == ["multishot", "chain"], "sharing goes both ways")
+	w.toggle_link(1, 2)
+	check(w.passives_for(0, 10).size() == 3, "chains connect through the middle slot")
+	check(w.passives_for(3, 10) == ["searing"], "slot outside the chain unaffected")
+	check(w.passives_for(0, 2) == ["multishot", "chain"], "chains into locked slots are ignored")
+	w.toggle_link(0, 1)
+	check(not w.has_link(0, 1), "dragging the same chain again breaks it")
+	w.toggle_link(0, 3)
+	w.clear_links(0)
+	check(w.links == [[1, 2]], "clear removes only that slot's chains")
+	w.slots[4]["passive"] = "chain"
+	w.toggle_link(1, 4)
+	check(w.passives_for(4, 10).count("chain") == 1, "same passive twice counts once")
 
 
 func test_items() -> void:
@@ -134,24 +177,35 @@ func test_items() -> void:
 			check(not ids.has(a["id"]), "no duplicate affixes")
 			ids[a["id"]] = true
 			check(not a["text"].contains("{"), "affix text formatted: " + a["text"])
-	var low := ItemGen.roll_item(1, Item.Rarity.NORMAL, "war_axe")
-	check(low.name == "War Axe", "forced base works")
+	var low := ItemGen.roll_item(1, Item.Rarity.NORMAL, "chainmail")
+	check(low.name == "Chainmail", "forced base works")
+	for i in 100:
+		check(ItemGen.roll_item(30).slot != "weapon", "weapons never drop (class weapon only)")
 
 
 func test_inventory_flow() -> void:
 	print("inventory")
-	var inv := Inventory.new()
+	var inv := Inventory.new("ranger")
 	inv.add_uncut("skill", 3)
-	inv.cut(0, "arc_bolt")
-	check(inv.skill_slots[0] != null and inv.skill_slots[0].skill_id == "arc_bolt", "cut gem goes to first empty slot")
-	check(inv.skill_slots[0].level == 3, "cut gem keeps level")
+	inv.cut(0, "split_arrow")
+	check(inv.skill_gems.size() == 1 and inv.skill_gems[0].level == 3, "cut skill gem goes to pouch with its level")
 	inv.add_uncut("support", 1)
-	inv.cut(0, "chain")
-	check(inv.supports.has("chain"), "support goes to pool")
-	check(inv.socket(0, "chain") == "", "socket chain into arc bolt")
-	check(inv.supports.is_empty(), "socketed support leaves pool")
-	inv.unsocket(0, 0)
-	check(inv.supports.has("chain") and inv.skill_slots[0].supports.is_empty(), "unsocket returns support")
+	inv.cut(0, "fury")
+	check(inv.passive_gems == ["fury"], "cut passive goes to pouch")
+	check(inv.set_passive(0, "fury") != "", "passive needs an active skill first")
+	inv.set_active(0, 0)
+	check(inv.weapon.slots[0]["active"].skill_id == "split_arrow" and inv.skill_gems.is_empty(), "active goes into weapon slot")
+	check(inv.set_passive(0, "fury") == "", "fury fits split arrow")
+	check(inv.passive_gems.is_empty(), "passive leaves the pouch")
+	inv.passive_gems.append("quickcast")
+	check(inv.set_passive(0, "quickcast") != "", "spell passive rejected on attack")
+	# Swapping in a skill the passive doesn't fit returns the passive to the pouch.
+	inv.skill_gems.append(SkillGem.new("fireball", 1))
+	inv.set_active(0, 0)
+	check(inv.weapon.slots[0]["passive"] == "" and inv.passive_gems.has("fury"), "unfitting passive returned")
+	check(inv.skill_gems.size() == 1 and inv.skill_gems[0].skill_id == "split_arrow", "old active returned")
+	inv.clear_active(0)
+	check(inv.weapon.slots[0]["active"] == null and inv.skill_gems.size() == 2, "clear active")
 	var item := ItemGen.roll_item(5, Item.Rarity.RARE, "padded_vest")
 	inv.add_item(item)
 	inv.equip_from_bag(0)
@@ -170,6 +224,10 @@ func test_data_integrity() -> void:
 	for id in DB.supports:
 		for m in DB.supports[id]["mods"]:
 			check(["flat", "increased", "more"].has(m["kind"]), "support %s mod kind valid" % id)
+	for id in DB.classes:
+		var c := DB.player_class(id)
+		check(DB.skills.has(c["start_skill"]), "class %s start skill exists" % id)
+		check(not Weapon.new(id).mods(1).is_empty(), "class %s weapon has stats" % id)
 	for a in DB.affixes:
 		for t in a["tiers"]:
 			check(t["values"].size() == a["mods"].size(), "affix %s tier values match mods" % a["id"])

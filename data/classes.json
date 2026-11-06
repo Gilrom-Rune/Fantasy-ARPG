@@ -1,0 +1,56 @@
+{
+	"warrior": {
+		"name": "Warrior",
+		"weapon": "Greatsword",
+		"description": "A tough frontline fighter. Lots of life and armour; the Greatsword hits hard up close.",
+		"color": [0.75, 0.35, 0.28],
+		"start_skill": "cleave",
+		"base": {"life": 70, "life_per_level": 12, "mana": 30, "mana_per_level": 3, "mana_regen": 2.5},
+		"weapon_mods": [
+			{"stat": "added_physical_min", "kind": "flat", "tags": ["attack"], "base": 5, "per_level": 1.2, "text": "Adds {0} to {1} Physical Damage to Attacks", "pair": "added_physical_max"},
+			{"stat": "added_physical_max", "kind": "flat", "tags": ["attack"], "base": 10, "per_level": 2.2},
+			{"stat": "armour", "kind": "flat", "base": 10, "per_level": 4, "text": "+{0} to Armour"}
+		]
+	},
+	"ranger": {
+		"name": "Ranger",
+		"weapon": "Bow",
+		"description": "A nimble archer who kills from range. Fast movement; the Bow empowers projectiles.",
+		"color": [0.35, 0.65, 0.35],
+		"start_skill": "power_shot",
+		"base": {"life": 55, "life_per_level": 9, "mana": 40, "mana_per_level": 4, "mana_regen": 3.0, "move_speed": 6.5},
+		"weapon_mods": [
+			{"stat": "added_physical_min", "kind": "flat", "tags": ["attack"], "base": 3, "per_level": 0.9, "text": "Adds {0} to {1} Physical Damage to Attacks", "pair": "added_physical_max"},
+			{"stat": "added_physical_max", "kind": "flat", "tags": ["attack"], "base": 8, "per_level": 1.8},
+			{"stat": "damage", "kind": "increased", "tags": ["projectile"], "base": 10, "per_level": 0.5, "text": "{0}% increased Projectile Damage"}
+		]
+	},
+	"mage": {
+		"name": "Mage",
+		"weapon": "Staff",
+		"description": "A fragile caster with a deep mana pool. The Staff greatly boosts spell damage.",
+		"color": [0.4, 0.45, 0.9],
+		"start_skill": "fireball",
+		"base": {"life": 50, "life_per_level": 8, "mana": 60, "mana_per_level": 6, "mana_regen": 4.0},
+		"weapon_mods": [
+			{"stat": "damage", "kind": "increased", "tags": ["spell"], "base": 20, "per_level": 1.5, "text": "{0}% increased Spell Damage"},
+			{"stat": "mana_regen", "kind": "increased", "base": 10, "per_level": 0.5, "text": "{0}% increased Mana Regeneration Rate"},
+			{"stat": "added_physical_min", "kind": "flat", "tags": ["attack"], "base": 2, "per_level": 0.4, "text": "Adds {0} to {1} Physical Damage to Attacks", "pair": "added_physical_max"},
+			{"stat": "added_physical_max", "kind": "flat", "tags": ["attack"], "base": 5, "per_level": 0.8}
+		]
+	},
+	"rogue": {
+		"name": "Rogue",
+		"weapon": "Twin Daggers",
+		"description": "A quick striker who relies on critical hits. The Twin Daggers grant attack speed and crit.",
+		"color": [0.55, 0.35, 0.65],
+		"start_skill": "dagger_strike",
+		"base": {"life": 58, "life_per_level": 9, "mana": 40, "mana_per_level": 4, "mana_regen": 3.0, "move_speed": 6.3},
+		"weapon_mods": [
+			{"stat": "added_physical_min", "kind": "flat", "tags": ["attack"], "base": 3, "per_level": 0.8, "text": "Adds {0} to {1} Physical Damage to Attacks", "pair": "added_physical_max"},
+			{"stat": "added_physical_max", "kind": "flat", "tags": ["attack"], "base": 7, "per_level": 1.6},
+			{"stat": "crit_chance", "kind": "increased", "base": 30, "per_level": 1.5, "text": "{0}% increased Critical Hit Chance"},
+			{"stat": "attack_speed", "kind": "increased", "base": 10, "per_level": 0.2, "text": "{0}% increased Attack Speed"}
+		]
+	}
+}

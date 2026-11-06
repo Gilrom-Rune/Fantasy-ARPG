@@ -1,20 +1,25 @@
 class_name SkillCompiler
 extends RefCounted
-## Turns a SkillGem + the character's stats into final numbers ("compiled skill").
-## Supports are just more modifiers merged into the character's StatBlock, so
-## any support works with any skill whose tags match - no special-case code.
+## Turns a SkillGem + the character's stats + its passive gems into final
+## numbers ("compiled skill"). Passives are just more modifiers merged into the
+## character's StatBlock, so any passive works with any skill whose tags match.
 
 const GEM_DAMAGE_GROWTH := 1.16  ## each gem level = 16% more base damage
 
 
-static func compile(gem: SkillGem, char_stats: StatBlock) -> Dictionary:
+## passives: passive gem ids (from the slot and its Soul Chain group).
+## Passives that do not fit this skill's tags are skipped.
+static func compile(gem: SkillGem, char_stats: StatBlock, passives: Array = []) -> Dictionary:
 	var d := gem.data()
 	var tags: Array = d.get("tags", []).duplicate()
+	var base_tags: Array = tags.duplicate()
 	var stats := char_stats.copy()
 	var support_names: Array = []
-	for sid in gem.supports:
+	var ignored: Array = []
+	for sid in passives:
 		var sup := DB.support(sid)
-		if sup.is_empty() or not SkillGem.support_fits(tags, sup):
+		if not SkillGem.support_fits(base_tags, sup):
+			ignored.append(sup.get("name", sid))
 			continue
 		stats.add_all(sup.get("mods", []), sid)
 		support_names.append(sup.get("name", sid))
@@ -29,6 +34,7 @@ static func compile(gem: SkillGem, char_stats: StatBlock) -> Dictionary:
 		"behavior": d.get("behavior", "projectile"),
 		"tags": tags,
 		"supports": support_names,
+		"ignored": ignored,
 	}
 
 	# --- Damage ------------------------------------------------------------
@@ -136,7 +142,9 @@ static func describe(c: Dictionary) -> String:
 	lines.append("%s  (Level %d)" % [c["name"], c["level"]])
 	lines.append("Tags: " + ", ".join(c["tags"]))
 	if not c["supports"].is_empty():
-		lines.append("Supported by: " + ", ".join(c["supports"]))
+		lines.append("Passives: " + ", ".join(c["supports"]))
+	if not c["ignored"].is_empty():
+		lines.append("Not compatible (ignored): " + ", ".join(c["ignored"]))
 	lines.append("")
 	for el in c["damage"]:
 		lines.append("%s damage: %d - %d" % [el.capitalize(), roundi(c["damage"][el][0]), roundi(c["damage"][el][1])])

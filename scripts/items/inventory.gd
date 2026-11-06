@@ -1,21 +1,25 @@
 class_name Inventory
 extends RefCounted
-## Everything the player owns: equipped gear, the bag, skill gems, support
-## gems and uncut gems. Emits `changed` whenever anything moves.
+## Everything the player owns: the class weapon (with its gem slots), worn
+## gear, the bag, and the gem pouch. Emits `changed` whenever anything moves.
 
 signal changed
 
 const BAG_SIZE := 40
-const SKILL_SLOTS := 4
 
-var equipment := {"weapon": null, "helmet": null, "body": null, "boots": null, "ring": null}
+var weapon: Weapon
+var equipment := {"helmet": null, "body": null, "boots": null, "ring": null, "amulet": null}
 var bag: Array = []
-var skill_slots: Array = [null, null, null, null]  ## SkillGem or null
-var loose_gems: Array = []  ## SkillGems not in a slot
-var supports: Array = []  ## support ids not socketed in anything
+var skill_gems: Array = []  ## SkillGems in the pouch (not in the weapon)
+var passive_gems: Array = []  ## passive gem ids in the pouch
 var uncut: Array = []  ## [{ "kind": "skill" | "support", "level": int }]
 
 
+func _init(class_id: String = "") -> void:
+	weapon = Weapon.new(class_id)
+
+
+# --- Gear ---------------------------------------------------------------------
 func add_item(item: Item) -> bool:
 	if bag.size() >= BAG_SIZE:
 		return false
@@ -52,64 +56,80 @@ func discard(index: int) -> void:
 		changed.emit()
 
 
+# --- Gems -----------------------------------------------------------------------
 func add_uncut(kind: String, level: int) -> void:
 	uncut.append({"kind": kind, "level": level})
 	changed.emit()
 
 
-## Turns an uncut gem into the chosen skill or support.
+## Turns an uncut gem into the chosen skill or passive. It goes into the pouch.
 func cut(index: int, choice_id: String) -> void:
 	if index < 0 or index >= uncut.size():
 		return
 	var u: Dictionary = uncut[index]
 	uncut.remove_at(index)
 	if u["kind"] == "skill":
-		var gem := SkillGem.new(choice_id, u["level"])
-		var empty := skill_slots.find(null)
-		if empty >= 0:
-			skill_slots[empty] = gem
-		else:
-			loose_gems.append(gem)
+		skill_gems.append(SkillGem.new(choice_id, u["level"]))
 	else:
-		supports.append(choice_id)
+		passive_gems.append(choice_id)
 	changed.emit()
 
 
-## Puts a loose skill gem into a slot. Whatever was there goes back to loose gems.
-func place_gem(slot_index: int, loose_index: int) -> void:
-	var gem: SkillGem = loose_gems[loose_index]
-	loose_gems.remove_at(loose_index)
-	if skill_slots[slot_index]:
-		loose_gems.append(skill_slots[slot_index])
-	skill_slots[slot_index] = gem
+## Moves a skill gem from the pouch into a weapon slot. The slot's old skill
+## goes back to the pouch, and so does its passive if it no longer fits.
+func set_active(slot_index: int, pouch_index: int) -> void:
+	var slot: Dictionary = weapon.slots[slot_index]
+	var gem: SkillGem = skill_gems[pouch_index]
+	skill_gems.remove_at(pouch_index)
+	if slot["active"]:
+		skill_gems.append(slot["active"])
+	slot["active"] = gem
+	if slot["passive"] != "" and not gem.fits(slot["passive"]):
+		passive_gems.append(slot["passive"])
+		slot["passive"] = ""
 	changed.emit()
 
 
-func remove_gem(slot_index: int) -> void:
-	var gem: SkillGem = skill_slots[slot_index]
-	if gem:
-		loose_gems.append(gem)
-		skill_slots[slot_index] = null
+func clear_active(slot_index: int) -> void:
+	var slot: Dictionary = weapon.slots[slot_index]
+	if slot["active"]:
+		skill_gems.append(slot["active"])
+		slot["active"] = null
 		changed.emit()
 
 
-func socket(slot_index: int, support_id: String) -> String:
-	var gem: SkillGem = skill_slots[slot_index]
+## Returns "" on success, otherwise why it can't go there.
+func set_passive(slot_index: int, passive_id: String) -> String:
+	var slot: Dictionary = weapon.slots[slot_index]
+	var gem: SkillGem = slot["active"]
 	if gem == null:
-		return "No skill in this slot"
-	var reason := gem.can_socket(support_id)
-	if reason != "":
-		return reason
-	gem.supports.append(support_id)
-	supports.erase(support_id)
+		return "Put an active skill in this slot first"
+	if not gem.fits(passive_id):
+		return "Needs " + SkillGem.requirement_text(passive_id)
+	if not passive_gems.has(passive_id):
+		return "You don't have that passive gem"
+	passive_gems.erase(passive_id)
+	if slot["passive"] != "":
+		passive_gems.append(slot["passive"])
+	slot["passive"] = passive_id
 	changed.emit()
 	return ""
 
 
-func unsocket(slot_index: int, support_index: int) -> void:
-	var gem: SkillGem = skill_slots[slot_index]
-	if gem == null or support_index >= gem.supports.size():
-		return
-	supports.append(gem.supports[support_index])
-	gem.supports.remove_at(support_index)
+func clear_passive(slot_index: int) -> void:
+	var slot: Dictionary = weapon.slots[slot_index]
+	if slot["passive"] != "":
+		passive_gems.append(slot["passive"])
+		slot["passive"] = ""
+		changed.emit()
+
+
+# --- Soul Chains ------------------------------------------------------------------
+func toggle_chain(a: int, b: int) -> void:
+	weapon.toggle_link(a, b)
+	changed.emit()
+
+
+func clear_chains(index: int) -> void:
+	weapon.clear_links(index)
 	changed.emit()

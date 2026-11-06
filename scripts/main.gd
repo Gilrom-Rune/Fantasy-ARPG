@@ -1,12 +1,14 @@
 extends Node3D
-## Entry point. Builds the arena, the player, the camera and the HUD, and
+## Entry point. Builds the arena and the camp, lets you pick a class, then
 ## spawns monster packs that get stronger as you kill more.
 ##
 ## Command line options (after a "--"), used for automated testing:
-##   --autoplay          a bot plays the game
+##   --autoplay          a bot plays the game (picks a random class)
+##   --class=ID          skip class selection (warrior, ranger, mage, rogue)
+##   --level=N           start at character level N
 ##   --seconds=N         quit after N seconds and print a summary
 ##   --screenshot=PATH   save a screenshot near the end of the run
-##   --inventory-shot    open the inventory before taking the screenshot
+##   --ui-shot=NAME      open a window before the screenshot: inventory, enchanter or classes
 
 const ARENA_HALF := 40.0
 const CAM_OFFSET := Vector3(0, 17, 11)
@@ -20,7 +22,11 @@ var kills_for_next_level := 25
 var elapsed := 0.0
 var run_seconds := 0.0
 var screenshot_path := ""
-var inventory_shot := false
+var ui_shot := ""
+var start_class := ""
+var start_level := 1
+var chest_timer := 20.0
+var class_select: ClassSelectUI
 var _screenshot_done := false
 var _bot_timer := 0.0
 var _deaths := 0
@@ -34,16 +40,37 @@ func _ready() -> void:
 	_parse_args()
 	_build_environment()
 	_build_arena()
-
-	player = Player.new()
-	player.name = "Player"
-	add_child(player)
-	Game.player = player
-
+	_build_camp()
+	for i in 2:
+		_spawn_chest()
 	camera = Camera3D.new()
 	camera.fov = 45
 	camera.far = 200
 	add_child(camera)
+	camera.global_position = CAM_OFFSET
+	camera.look_at(Vector3.ZERO, Vector3.UP)
+
+	if start_class == "" and Game.autoplay:
+		start_class = DB.classes.keys().pick_random()
+	if start_class != "" and ui_shot != "classes":
+		_start_game(start_class)
+	else:
+		class_select = ClassSelectUI.new()
+		add_child(class_select)
+		class_select.chosen.connect(_start_game)
+
+
+func _start_game(class_id: String) -> void:
+	if class_select:
+		class_select.queue_free()
+		class_select = null
+	player = Player.new()
+	player.name = "Player"
+	player.class_id = class_id
+	player.level = clampi(start_level, 1, Player.MAX_LEVEL)
+	add_child(player)
+	Game.player = player
+
 	camera.global_position = player.global_position + CAM_OFFSET
 	camera.look_at(player.global_position, Vector3.UP)
 	player.camera = camera
@@ -53,7 +80,8 @@ func _ready() -> void:
 	Game.hud = hud
 	hud.setup(player)
 	hud.respawn_requested.connect(_on_respawn)
-	Game.message("Welcome! Press I to open your inventory and cut your uncut gems.", Color(1.0, 0.9, 0.6))
+	Game.message("Welcome, %s! Walk to the Enchanter's Table and press F to cut your gems." % player.class_name_text(), Color(1.0, 0.9, 0.6))
+	Game.message("You are in the camp - monsters can't enter it.", Color(0.7, 0.85, 1.0))
 
 
 func _setup_input() -> void:
@@ -65,6 +93,9 @@ func _setup_input() -> void:
 	_bind("skill_2", [], [MOUSE_BUTTON_RIGHT])
 	_bind("skill_3", [KEY_Q])
 	_bind("skill_4", [KEY_E])
+	for n in 6:
+		_bind("skill_%d" % (n + 5), [KEY_1 + n])
+	_bind("interact", [KEY_F])
 	_bind("inventory", [KEY_I, KEY_TAB])
 	_bind("respawn", [KEY_R])
 
@@ -89,8 +120,12 @@ func _parse_args() -> void:
 			Game.autoplay = true
 		elif a.begins_with("--seconds="):
 			run_seconds = float(a.get_slice("=", 1))
-		elif a == "--inventory-shot":
-			inventory_shot = true
+		elif a.begins_with("--ui-shot="):
+			ui_shot = a.get_slice("=", 1)
+		elif a.begins_with("--class="):
+			start_class = a.get_slice("=", 1)
+		elif a.begins_with("--level="):
+			start_level = int(a.get_slice("=", 1))
 		elif a.begins_with("--screenshot="):
 			screenshot_path = a.get_slice("=", 1)
 
@@ -187,6 +222,55 @@ func _build_arena() -> void:
 			obstacles.append({"pos": pos, "r": length * 0.5 + 0.5})
 
 
+## The safe camp in the middle of the arena, with the Enchanter's Table.
+func _build_camp() -> void:
+	var ground := MeshInstance3D.new()
+	var disc := CylinderMesh.new()
+	disc.top_radius = Game.CAMP_RADIUS
+	disc.bottom_radius = Game.CAMP_RADIUS
+	disc.height = 0.04
+	disc.radial_segments = 48
+	ground.mesh = disc
+	var gm := StandardMaterial3D.new()
+	gm.albedo_color = Color(0.24, 0.2, 0.15)
+	gm.roughness = 1.0
+	ground.material_override = gm
+	add_child(ground)
+	ground.position.y = 0.01
+	var border := MeshInstance3D.new()
+	var torus := TorusMesh.new()
+	torus.inner_radius = Game.CAMP_RADIUS - 0.15
+	torus.outer_radius = Game.CAMP_RADIUS + 0.15
+	torus.rings = 64
+	border.mesh = torus
+	border.scale = Vector3(1, 0.3, 1)
+	border.material_override = Fx.glow_mat(Color(0.3, 0.5, 0.8), 0.5)
+	add_child(border)
+	# Posts around the edge, every other one with a torch.
+	for i in 8:
+		var a := TAU * i / 8.0
+		var pos := Vector3(cos(a), 0, sin(a)) * (Game.CAMP_RADIUS + 0.4)
+		_add_block(pos + Vector3(0, 0.6, 0), Vector3(0.35, 1.2, 0.35), Color(0.35, 0.24, 0.14))
+		if i % 2 == 0:
+			_add_torch(pos + Vector3(0, 1.4, 0))
+	var table := EnchanterTable.new()
+	add_child(table)
+	table.global_position = Vector3(0, 0, -3.0)
+
+
+func _spawn_chest() -> void:
+	for attempt in 40:
+		var pos := Vector3(randf_range(-ARENA_HALF + 4, ARENA_HALF - 4), 0, randf_range(-ARENA_HALF + 4, ARENA_HALF - 4))
+		if Game.in_camp(pos, 5.0) or _blocked(pos, 1.5):
+			continue
+		var chest := Chest.new()
+		chest.level = Game.area_level
+		add_child(chest)
+		chest.global_position = pos
+		chest.rotation.y = randf() * TAU
+		return
+
+
 func _add_block(pos: Vector3, size: Vector3, color: Color, round_shape: bool = false) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
@@ -242,6 +326,11 @@ func _add_torch(pos: Vector3) -> void:
 # --- Game loop -----------------------------------------------------------------
 func _process(delta: float) -> void:
 	elapsed += delta
+	if player == null:
+		if ui_shot == "classes" and screenshot_path != "" and not _screenshot_done and elapsed > 1.0:
+			_screenshot_done = true
+			_take_screenshot()
+		return
 	var target := player.global_position + CAM_OFFSET
 	camera.global_position = camera.global_position.lerp(target, 1.0 - exp(-8.0 * delta))
 	camera.look_at(camera.global_position - CAM_OFFSET + Vector3(0, 0.5, 0), Vector3.UP)
@@ -263,8 +352,13 @@ func _process(delta: float) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if player.dead:
+	if player == null or player.dead:
 		return
+	chest_timer -= delta
+	if chest_timer <= 0.0:
+		chest_timer = 25.0
+		if get_tree().get_nodes_in_group("chests").size() < 3:
+			_spawn_chest()
 	if Game.kills >= kills_for_next_level:
 		Game.area_level += 1
 		kills_for_next_level += 20 + 5 * Game.area_level
@@ -285,7 +379,7 @@ func _spawn_pack() -> void:
 		center = player.global_position + Vector3(cos(angle), 0, sin(angle)) * dist
 		if absf(center.x) > ARENA_HALF - 4 or absf(center.z) > ARENA_HALF - 4:
 			continue
-		if _blocked(center, 2.5):
+		if _blocked(center, 2.5) or Game.in_camp(center, 6.0):
 			continue
 		found = true
 		break
@@ -332,55 +426,67 @@ func _bot_manage_inventory() -> void:
 		var u: Dictionary = inv.uncut[0]
 		var ids := DB.player_skill_ids() if u["kind"] == "skill" else DB.support_ids()
 		inv.cut(0, ids.pick_random())
-	for i in Inventory.SKILL_SLOTS:
-		if inv.skill_slots[i] == null and not inv.loose_gems.is_empty():
-			inv.place_gem(i, 0)
-		if inv.skill_slots[i] != null:
-			for sid in inv.supports.duplicate():
-				inv.socket(i, sid)
+	var open := player.unlocked_slots()
+	for i in open:
+		var slot: Dictionary = inv.weapon.slots[i]
+		if slot["active"] == null and not inv.skill_gems.is_empty():
+			inv.set_active(i, 0)
+		if slot["active"] != null and slot["passive"] == "":
+			for pid in inv.passive_gems.duplicate():
+				if inv.set_passive(i, pid) == "":
+					break
+	if open >= 2 and inv.weapon.links.is_empty():
+		inv.toggle_chain(0, 1)
 	for i in range(inv.bag.size() - 1, -1, -1):
 		var item: Item = inv.bag[i]
 		var current: Item = inv.equipment[item.slot]
 		if current == null or item.rarity > current.rarity:
 			inv.equip_from_bag(i)
-	# Exercise the inventory window so UI errors show up in automated runs.
+	# Exercise both windows so UI errors show up in automated runs.
 	hud.inventory_ui.visible = true
 	hud.inventory_ui.refresh()
-	if not inv.uncut.is_empty():
-		hud.inventory_ui._choose_cut(0)
-	hud.inventory_ui._choose_skill_for_slot(0)
-	if inv.skill_slots[0]:
-		hud.inventory_ui._choose_support_for_slot(0)
-	hud.inventory_ui._chooser.visible = false
 	hud.inventory_ui.visible = false
+	hud.enchanter_ui.visible = true
+	hud.enchanter_ui.exercise()
+	hud.enchanter_ui.visible = false
 
 
 func _take_screenshot() -> void:
-	if inventory_shot:
+	var opened_menu := false
+	if ui_shot == "inventory":
 		hud.toggle_inventory()
-		await RenderingServer.frame_post_draw
+		opened_menu = true
+	elif ui_shot == "enchanter":
+		hud.open_enchanter()
+		opened_menu = true
+	await RenderingServer.frame_post_draw
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()
 	if img:
 		img.save_png(screenshot_path)
 		print("Saved screenshot to ", screenshot_path)
-	if inventory_shot:
-		# The game is paused while the inventory is open, so quit from here.
+	if opened_menu or player == null:
+		# The game is paused while a window is open, so quit from here.
 		_print_summary()
 		get_tree().quit()
 
 
 func _print_summary() -> void:
-	var inv := player.inv
 	print("=== AUTOPLAY SUMMARY ===")
-	print("time: %.1fs  kills: %d  player level: %d  area level: %d  deaths: %d" % [elapsed, Game.kills, player.level, Game.area_level, _deaths])
+	if player == null:
+		print("(no class chosen)")
+		return
+	var inv := player.inv
+	print("class: %s  time: %.1fs  kills: %d  player level: %d  area level: %d  deaths: %d" % [player.class_id, elapsed, Game.kills, player.level, Game.area_level, _deaths])
 	var equipped := []
 	for slot in inv.equipment:
 		if inv.equipment[slot]:
 			equipped.append("%s=%s" % [slot, inv.equipment[slot].name])
 	print("equipped: ", ", ".join(equipped))
-	print("bag items: %d  spare supports: %d  uncut: %d" % [inv.bag.size(), inv.supports.size(), inv.uncut.size()])
-	for i in Inventory.SKILL_SLOTS:
-		var g: SkillGem = inv.skill_slots[i]
+	print("bag items: %d  pouch skills: %d  pouch passives: %d  uncut: %d  chains: %s" % [inv.bag.size(), inv.skill_gems.size(), inv.passive_gems.size(), inv.uncut.size(), inv.weapon.links])
+	for i in player.unlocked_slots():
+		var slot: Dictionary = inv.weapon.slots[i]
+		var g: SkillGem = slot["active"]
 		if g:
-			print("slot %s: %s + %s  avg hit %.1f" % [Player.SLOT_KEYS[i], g.display_name(), g.supports, player.compiled[i]["average_hit"]])
+			var c: Dictionary = player.compiled[i]
+			print("slot %s: %s  passives %s  avg hit %.1f" % [Player.SLOT_KEYS[i], g.display_name(), c["supports"], c["average_hit"]])

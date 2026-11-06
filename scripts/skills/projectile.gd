@@ -71,6 +71,9 @@ func _physics_process(delta: float) -> void:
 		return
 	global_position += step
 	travelled += step.length()
+	if team != 0 and Game.in_camp(global_position):
+		queue_free()  # monster projectiles can't reach into the camp
+		return
 	if travelled >= max_dist:
 		_end(global_position)
 		return
