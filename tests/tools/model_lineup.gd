@@ -1,8 +1,7 @@
 extends SceneTree
 ## Renders modular Quaternius characters side by side to a PNG, for checking
 ## outfits. Only the HEAD of the base body is kept; the outfit pieces form the
-## rest of the body (see head_only). Was:
-## how outfits look. Run with a display (xvfb-run) and:
+## rest of the body (see head_only). Run with a display (xvfb-run) and:
 ##   godot --path . --script res://tests/tools/model_lineup.gd -- --out=/path/lineup.png
 
 const Q := "res://assets/quaternius/"
