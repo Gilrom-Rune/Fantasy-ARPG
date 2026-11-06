@@ -11,7 +11,7 @@ extends Node3D
 ##   --ui-shot=NAME      open a window before the screenshot: inventory, enchanter or classes
 
 const ARENA_HALF := 40.0
-const CAM_OFFSET := Vector3(0, 11, 8)
+const CAM_OFFSET := Vector3(0, 13, 9.5)
 
 var player: Player
 var camera: Camera3D

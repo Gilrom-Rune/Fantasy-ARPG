@@ -116,7 +116,7 @@
 	},
 	"q_warrior": {
 		"file": "res://assets/characters/Knight.glb",
-		"scale": 1.15,
+		"scale": 1.0,
 		"keep_weapons": [
 			"2H_Sword"
 		],
@@ -140,13 +140,13 @@
 			"res://assets/quaternius/Male_Peasant_Feet.gltf"
 		],
 		"portrait_eye": [
-			-0.48,
-			1.93,
-			-1.15
+			-0.45,
+			1.7,
+			-1.05
 		],
 		"portrait_look": [
 			0.0,
-			1.85,
+			1.62,
 			0.0
 		],
 		"preview_eye": [
@@ -162,7 +162,7 @@
 	},
 	"q_ranger": {
 		"file": "res://assets/characters/Rogue_Hooded.glb",
-		"scale": 1.15,
+		"scale": 1.0,
 		"keep_weapons": [
 			"2H_Crossbow"
 		],
@@ -188,13 +188,13 @@
 			"res://assets/quaternius/Male_Ranger_Acc_Pauldron.gltf"
 		],
 		"portrait_eye": [
-			-0.48,
-			1.93,
-			-1.15
+			-0.45,
+			1.7,
+			-1.05
 		],
 		"portrait_look": [
 			0.0,
-			1.85,
+			1.62,
 			0.0
 		],
 		"preview_eye": [
@@ -210,7 +210,7 @@
 	},
 	"q_mage": {
 		"file": "res://assets/characters/Mage.glb",
-		"scale": 1.15,
+		"scale": 1.0,
 		"keep_weapons": [
 			"2H_Staff"
 		],
@@ -234,13 +234,13 @@
 			"res://assets/quaternius/Female_Peasant_Feet.gltf"
 		],
 		"portrait_eye": [
-			-0.45,
-			1.83,
-			-1.1
+			-0.42,
+			1.61,
+			-1.0
 		],
 		"portrait_look": [
 			0.0,
-			1.75,
+			1.53,
 			0.0
 		],
 		"preview_eye": [
@@ -256,7 +256,7 @@
 	},
 	"q_rogue": {
 		"file": "res://assets/characters/Rogue.glb",
-		"scale": 1.15,
+		"scale": 1.0,
 		"keep_weapons": [
 			"Knife",
 			"Knife_Offhand"
@@ -283,13 +283,13 @@
 			"res://assets/quaternius/Female_Ranger_Acc_Pauldrons.gltf"
 		],
 		"portrait_eye": [
-			-0.45,
-			1.83,
-			-1.1
+			-0.42,
+			1.61,
+			-1.0
 		],
 		"portrait_look": [
 			0.0,
-			1.75,
+			1.53,
 			0.0
 		],
 		"preview_eye": [
