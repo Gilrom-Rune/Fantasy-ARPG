@@ -32,12 +32,13 @@ func _card(id: String) -> Control:
 	var c: Array = d.get("color", [0.5, 0.5, 0.5])
 	var color := Color(c[0], c[1], c[2])
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(300, 330)
+	panel.custom_minimum_size = Vector2(300, 560)
 	panel.add_theme_stylebox_override("panel", UiUtil.box(Color(0.08, 0.08, 0.1), color, 8, 16))
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 10)
 	panel.add_child(v)
 	v.add_child(UiUtil.label(String(d.get("name", id)), 26, color.lightened(0.3)))
+	v.add_child(_preview(String(d.get("model", ""))))
 	v.add_child(UiUtil.label("Weapon: " + String(d.get("weapon", "")), 16, Color(1.0, 0.75, 0.45)))
 	var desc := UiUtil.label(String(d.get("description", "")), 14)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -53,3 +54,39 @@ func _card(id: String) -> Control:
 	b.custom_minimum_size = Vector2(0, 40)
 	v.add_child(b)
 	return panel
+
+
+## A small live 3D view of the class's character, idling.
+func _preview(model_id: String) -> Control:
+	var box := SubViewportContainer.new()
+	box.stretch = true
+	box.custom_minimum_size = Vector2(268, 230)
+	var vp := SubViewport.new()
+	vp.own_world_3d = true
+	vp.transparent_bg = true
+	vp.msaa_3d = Viewport.MSAA_4X
+	box.add_child(vp)
+
+	var env := Environment.new()
+	env.background_mode = Environment.BG_CLEAR_COLOR
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color(0.6, 0.6, 0.7)
+	env.ambient_light_energy = 0.8
+	env.tonemap_mode = Environment.TONE_MAPPER_ACES
+	var we := WorldEnvironment.new()
+	we.environment = env
+	vp.add_child(we)
+	var sun := DirectionalLight3D.new()
+	sun.rotation_degrees = Vector3(-35, 200, 0)
+	sun.light_energy = 1.3
+	vp.add_child(sun)
+
+	var model := CharacterModel.create(model_id)
+	if model:
+		vp.add_child(model)
+	var cam := Camera3D.new()
+	cam.fov = 35
+	vp.add_child(cam)
+	var eye := Vector3(-0.9, 1.5, -3.6)
+	cam.transform = Transform3D(Basis.looking_at(Vector3(0, 0.95, 0) - eye, Vector3.UP), eye)
+	return box

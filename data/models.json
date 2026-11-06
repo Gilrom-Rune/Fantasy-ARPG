@@ -1,0 +1,91 @@
+{
+	"knight": {
+		"file": "res://assets/characters/Knight.glb",
+		"scale": 0.82,
+		"keep_weapons": ["2H_Sword"],
+		"idle": "2H_Melee_Idle",
+		"run": "Running_A",
+		"death": "Death_A",
+		"actions": {
+			"melee": "2H_Melee_Attack_Slice",
+			"nova": "2H_Melee_Attack_Spin",
+			"ranged": "1H_Ranged_Shoot",
+			"spell": "Spellcast_Shoot",
+			"spell_nova": "Spellcast_Raise"
+		}
+	},
+	"ranger": {
+		"file": "res://assets/characters/Rogue_Hooded.glb",
+		"scale": 0.82,
+		"keep_weapons": ["2H_Crossbow"],
+		"idle": "Idle",
+		"run": "Running_A",
+		"death": "Death_A",
+		"actions": {
+			"melee": "1H_Melee_Attack_Chop",
+			"nova": "2H_Melee_Attack_Spin",
+			"ranged": "2H_Ranged_Shoot",
+			"spell": "Spellcast_Shoot",
+			"spell_nova": "Spellcast_Raise"
+		}
+	},
+	"mage": {
+		"file": "res://assets/characters/Mage.glb",
+		"scale": 0.82,
+		"keep_weapons": ["2H_Staff"],
+		"idle": "Idle",
+		"run": "Running_A",
+		"death": "Death_A",
+		"actions": {
+			"melee": "2H_Melee_Attack_Chop",
+			"nova": "2H_Melee_Attack_Spin",
+			"ranged": "Spellcast_Shoot",
+			"spell": "Spellcast_Shoot",
+			"spell_nova": "Spellcast_Raise"
+		}
+	},
+	"rogue": {
+		"file": "res://assets/characters/Rogue.glb",
+		"scale": 0.82,
+		"keep_weapons": ["Knife", "Knife_Offhand"],
+		"idle": "Idle",
+		"run": "Running_A",
+		"death": "Death_A",
+		"actions": {
+			"melee": "Dualwield_Melee_Attack_Chop",
+			"nova": "2H_Melee_Attack_Spin",
+			"ranged": "Throw",
+			"spell": "Spellcast_Shoot",
+			"spell_nova": "Spellcast_Raise"
+		}
+	},
+	"skeleton_warrior": {
+		"file": "res://assets/characters/Skeleton_Warrior.glb",
+		"scale": 0.82,
+		"attach": [{"bone": "handslot.r", "file": "res://assets/weapons/Skeleton_Axe.gltf"}],
+		"idle": "Idle_Combat",
+		"run": "Running_A",
+		"run_speed": 4.5,
+		"death": "Death_C_Skeletons",
+		"actions": {"melee": "1H_Melee_Attack_Chop"}
+	},
+	"skeleton_mage": {
+		"file": "res://assets/characters/Skeleton_Mage.glb",
+		"scale": 0.82,
+		"attach": [{"bone": "handslot.r", "file": "res://assets/weapons/Skeleton_Staff.gltf"}],
+		"idle": "Idle",
+		"run": "Walking_A",
+		"run_speed": 2.5,
+		"death": "Death_C_Skeletons",
+		"actions": {"melee": "1H_Melee_Attack_Chop", "spell": "Spellcast_Shoot"}
+	},
+	"skeleton_minion": {
+		"file": "res://assets/characters/Skeleton_Minion.glb",
+		"scale": 0.78,
+		"idle": "Idle_B",
+		"run": "Running_C",
+		"run_speed": 5.0,
+		"death": "Death_C_Skeletons",
+		"actions": {"melee": "Unarmed_Melee_Attack_Punch_A"}
+	}
+}

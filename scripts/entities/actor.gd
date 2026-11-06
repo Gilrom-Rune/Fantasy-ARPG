@@ -39,7 +39,8 @@ var ignite_source: Actor = null
 var chill_time := 0.0
 var shock_time := 0.0
 
-var body_mat: StandardMaterial3D
+var body_mat: StandardMaterial3D  ## only used by the plain-capsule fallback body
+var model: CharacterModel  ## the animated 3D character, if it has one
 var base_glow := Color.BLACK
 var _flash := 0.0
 
@@ -79,6 +80,10 @@ func _physics_process(delta: float) -> void:
 		return
 	_think(delta)
 	global_position.y = 0.0
+	if model:
+		var v := velocity
+		v.y = 0
+		model.update(v.length(), delta)
 
 
 ## Override in subclasses for AI / input.
@@ -104,7 +109,7 @@ func _tick(delta: float) -> void:
 
 
 func _update_tint() -> void:
-	if body_mat == null:
+	if body_mat == null and model == null:
 		return
 	var glow := base_glow
 	if ignite_time > 0.0:
@@ -115,7 +120,12 @@ func _update_tint() -> void:
 		glow += Color(0.25, 0.22, 0.02) * (0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.05))
 	if _flash > 0.0:
 		glow = Color(0.8, 0.8, 0.8)
-	body_mat.emission = glow
+	if model:
+		var strength := maxf(glow.r, maxf(glow.g, glow.b))
+		var col := glow / strength if strength > 0.0 else Color.BLACK
+		model.set_tint(col, strength * 0.7)
+	else:
+		body_mat.emission = glow
 
 
 func take_hit(hit: Dictionary, source: Actor) -> void:
@@ -191,6 +201,8 @@ func use_skill(c: Dictionary, target_point: Vector3, key: String) -> bool:
 	if c["cooldown"] > 0.0:
 		cooldowns[key] = c["cooldown"]
 	face(target_point - global_position)
+	if model:
+		model.play_action(model.action_for(c), busy_time)
 	SkillExecutor.execute(self, c, target_point)
 	for i in range(1, c["repeats"] + 1):
 		get_tree().create_timer(0.18 * i, false).timeout.connect(func():
@@ -199,9 +211,9 @@ func use_skill(c: Dictionary, target_point: Vector3, key: String) -> bool:
 	return true
 
 
-## Creates the collision shape and a simple capsule body with a "nose" showing
-## which way the actor faces. Swap this for real models later.
-func build_body(color: Color, height: float, r: float) -> void:
+## Creates the collision shape and the visible body: the animated model from
+## data/models.json, or a plain capsule with a "nose" if there is no model.
+func build_body(color: Color, height: float, r: float, model_id: String = "", model_scale: float = 1.0) -> void:
 	radius = r
 	bar_height = height + 0.35
 	var col := CollisionShape3D.new()
@@ -211,6 +223,13 @@ func build_body(color: Color, height: float, r: float) -> void:
 	col.shape = cap
 	col.position.y = height * 0.5
 	add_child(col)
+
+	if model_id != "":
+		model = CharacterModel.create(model_id)
+		if model:
+			add_child(model)
+			model.scale *= model_scale
+			return
 
 	var mi := MeshInstance3D.new()
 	var cm := CapsuleMesh.new()

@@ -11,7 +11,7 @@ extends Node3D
 ##   --ui-shot=NAME      open a window before the screenshot: inventory, enchanter or classes
 
 const ARENA_HALF := 40.0
-const CAM_OFFSET := Vector3(0, 17, 11)
+const CAM_OFFSET := Vector3(0, 13, 9.5)
 
 var player: Player
 var camera: Camera3D
@@ -389,7 +389,8 @@ func _spawn_pack() -> void:
 	var leader_rarity := 2 if r < 0.06 else (1 if r < 0.3 else 0)
 	var count := randi_range(3, 6)
 	for i in count:
-		var kind := "caster" if randf() < 0.3 else "brute"
+		var roll := randf()
+		var kind := "caster" if roll < 0.25 else ("minion" if roll < 0.55 else "brute")
 		var rarity := leader_rarity if i == 0 else (1 if randf() < 0.08 else 0)
 		var pos := center + Vector3(randf_range(-2.5, 2.5), 0, randf_range(-2.5, 2.5))
 		if _blocked(pos, 1.0):

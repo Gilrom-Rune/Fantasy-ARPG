@@ -17,6 +17,7 @@ static var supports: Dictionary = {}
 static var bases: Dictionary = {}
 static var affixes: Array = []
 static var classes: Dictionary = {}
+static var models: Dictionary = {}
 static var _loaded := false
 
 
@@ -28,6 +29,7 @@ static func ensure_loaded() -> void:
 	bases = _load_json("res://data/item_bases.json", {})
 	affixes = _load_json("res://data/affixes.json", [])
 	classes = _load_json("res://data/classes.json", {})
+	models = _load_json("res://data/models.json", {})
 	_loaded = true
 
 
@@ -51,6 +53,11 @@ static func skill(id: String) -> Dictionary:
 static func player_class(id: String) -> Dictionary:
 	ensure_loaded()
 	return classes.get(id, {})
+
+
+static func model(id: String) -> Dictionary:
+	ensure_loaded()
+	return models.get(id, {})
 
 
 static func support(id: String) -> Dictionary:

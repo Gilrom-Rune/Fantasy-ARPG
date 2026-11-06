@@ -4,14 +4,19 @@ extends Actor
 
 const KINDS := {
 	"brute": {
-		"name": "Ghoul", "life": 30.0, "skill": "monster_slam", "speed": 3.4,
+		"name": "Skeleton Warrior", "life": 30.0, "skill": "monster_slam", "speed": 3.4,
 		"attack_range": 1.8, "windup": 0.45, "color": Color(0.5, 0.4, 0.3),
-		"height": 1.7, "radius": 0.5, "xp": 6.0,
+		"height": 1.7, "radius": 0.5, "xp": 6.0, "model": "skeleton_warrior",
 	},
 	"caster": {
-		"name": "Hexer", "life": 18.0, "skill": "monster_bolt", "speed": 3.0,
+		"name": "Skeleton Mage", "life": 18.0, "skill": "monster_bolt", "speed": 3.0,
 		"attack_range": 12.0, "keep_away": 5.0, "windup": 0.5, "color": Color(0.42, 0.28, 0.58),
-		"height": 1.5, "radius": 0.4, "xp": 7.0,
+		"height": 1.5, "radius": 0.4, "xp": 7.0, "model": "skeleton_mage",
+	},
+	"minion": {
+		"name": "Skeleton Minion", "life": 16.0, "skill": "monster_slam", "speed": 4.6,
+		"attack_range": 1.5, "windup": 0.35, "color": Color(0.7, 0.68, 0.6),
+		"height": 1.5, "radius": 0.4, "xp": 4.0, "model": "skeleton_minion",
 	},
 }
 const RARITY_LIFE := [1.0, 2.4, 5.5]
@@ -47,7 +52,7 @@ func _ready() -> void:
 	collision_layer = 4
 	collision_mask = 1 | 2 | 4
 	var s: float = RARITY_SIZE[rarity]
-	build_body(info["color"], info["height"] * s, info["radius"] * s)
+	build_body(info["color"], info["height"] * s, info["radius"] * s, info.get("model", ""), s)
 	base_stats = {
 		"life": info["life"] * pow(1.15, level - 1) * RARITY_LIFE[rarity],
 		"move_speed": info["speed"] * (1.0 + 0.06 * rarity),
@@ -67,10 +72,10 @@ func _ready() -> void:
 			display_name = info["name"]
 		1:
 			display_name = "%s %s" % [MAGIC_PREFIX.pick_random(), info["name"]]
-			base_glow = Color(0.05, 0.12, 0.45)
+			base_glow = Color(0.08, 0.16, 0.5) * 0.6
 		2:
 			display_name = "%s, %s" % [RARE_PREFIX.pick_random(), info["name"]]
-			base_glow = Color(0.45, 0.35, 0.05)
+			base_glow = Color(0.6, 0.48, 0.08) * 0.6
 
 
 func name_color() -> Color:
@@ -95,6 +100,8 @@ func _think(delta: float) -> void:
 		windup -= delta * action_speed()
 		if body_mat:
 			body_mat.emission += Color(0.6, 0.1, 0.05)
+		elif model:
+			model.set_tint(Color(1.0, 0.25, 0.1), 0.25)  # red glow = "about to hit you"
 		if windup <= 0.0:
 			face(windup_target - global_position)
 			SkillExecutor.execute(self, compiled, windup_target)
@@ -112,6 +119,9 @@ func _think(delta: float) -> void:
 		face(dir)
 		windup = info["windup"]
 		windup_target = p.global_position
+		if model:
+			# The swing lands as the wind-up ends.
+			model.play_action(model.action_for(compiled), windup / action_speed() * 1.8)
 	else:
 		_move(dir, delta)
 		face(dir)
@@ -147,5 +157,12 @@ func _on_death(_source: Actor) -> void:
 		Game.player.gain_xp(info["xp"] * level * RARITY_XP[rarity])
 	LootDrop.roll_drops(global_position, level, rarity)
 	var tw := create_tween()
-	tw.tween_property(self, "scale", Vector3(1.3, 0.05, 1.3), 0.25)
+	if model:
+		model.set_tint(Color.BLACK, 0.0)
+		model.play_death()
+		set_physics_process(false)
+		tw.tween_interval(1.6)
+		tw.tween_property(self, "position:y", -1.5, 0.8)  # sink into the ground
+	else:
+		tw.tween_property(self, "scale", Vector3(1.3, 0.05, 1.3), 0.25)
 	tw.tween_callback(queue_free)

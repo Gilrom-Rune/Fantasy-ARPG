@@ -28,7 +28,7 @@ func _ready() -> void:
 	collision_layer = 2
 	collision_mask = 1 | 4
 	var c: Array = DB.player_class(class_id).get("color", [0.32, 0.48, 0.85])
-	build_body(Color(c[0], c[1], c[2]), 1.8, 0.45)
+	build_body(Color(c[0], c[1], c[2]), 1.8, 0.45, String(DB.player_class(class_id).get("model", "")))
 	var ring := MeshInstance3D.new()
 	var torus := TorusMesh.new()
 	torus.inner_radius = 0.62
@@ -198,6 +198,8 @@ func _pickup_nearby() -> void:
 
 func _on_death(_source: Actor) -> void:
 	velocity = Vector3.ZERO
+	if model:
+		model.play_death()
 	Game.message("You have died.", Color(1, 0.3, 0.3))
 	if Game.hud:
 		Game.hud.show_death()
@@ -205,6 +207,8 @@ func _on_death(_source: Actor) -> void:
 
 func respawn() -> void:
 	dead = false
+	if model:
+		model.revive()
 	ignite_time = 0.0
 	ignite_dps = 0.0
 	chill_time = 0.0

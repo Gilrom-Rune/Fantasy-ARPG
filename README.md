@@ -2,7 +2,7 @@
 
 An ARPG set in a fantasy world with 4 main classes and a subclass. It will have a versatile skill tree and a unique weapon system.
 
-> **Current state: playable prototype.** Pick one of 4 classes, fight endless monster waves in an arena, and build your class weapon at the Enchanter's Table. Everything is placeholder shapes for now; art comes later.
+> **Current state: playable prototype.** Pick one of 4 classes, fight endless monster waves in an arena, and build your class weapon at the Enchanter's Table. Characters and monsters are animated low-poly fantasy models; the arena itself is still placeholder shapes.
 
 ## How to play it
 
@@ -59,6 +59,7 @@ All content is in plain data files in `data/`:
 | `data/classes.json` | Classes, their weapon, base stats, and how the weapon grows per level |
 | `data/skills.json` | Active skills: damage, tags, speed, mana cost, projectiles, radius… |
 | `data/supports.json` | Passive gems: which tags they need and which modifiers they add |
+| `data/models.json` | Which 3D model each class/monster uses, which weapon it holds, and which animations it plays |
 | `data/item_bases.json` | Item base types (swords, helmets, rings…) |
 | `data/affixes.json` | Random item modifiers and their value tiers |
 
@@ -90,6 +91,7 @@ scripts/
   world/          loot drops, chests, the Enchanter's Table
   ui/             HUD, inventory, Enchanter's Table window, class select, damage numbers
   main.gd         builds the arena, spawns monsters
+assets/           3D models (characters, weapons) and their licenses
 tests/            automated tests
 ```
 
@@ -102,3 +104,7 @@ godot --headless --fixed-fps 60 --path . -- --autoplay --class=mage --level=35 -
 ```
 
 The first command runs unit tests for the stat math, passives, weapon slots, Soul Chains, items and inventory. The others let a bot play the game for 90 seconds and prints a summary, which catches crashes and script errors.
+
+## Credits
+
+Character and monster models and animations: **KayKit Adventurers** and **KayKit Skeletons** character packs by **Kay Lousberg** ([kaylousberg.com](https://www.kaylousberg.com)), licensed CC0 (public domain). Free to use, including commercially. Licenses are in `assets/`.
