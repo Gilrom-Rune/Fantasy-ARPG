@@ -1,7 +1,7 @@
 extends SceneTree
 ## Renders modular Quaternius characters side by side to a PNG, for checking
 ## outfits. Only the HEAD of the base body is kept; the outfit pieces form the
-## rest of the body (see head_only). Run with a display (xvfb-run) and:
+## rest of the body (see ModularBody). Run with a display (xvfb-run) and:
 ##   godot --path . --script res://tests/tools/model_lineup.gd -- --out=/path/lineup.png
 
 const Q := "res://assets/quaternius/"
@@ -57,65 +57,5 @@ func _initialize() -> void:
 
 
 func _assemble(parts: Array) -> Node3D:
-	var base: Node3D = (load(Q + parts[0] + ".gltf") as PackedScene).instantiate()
-	var skel: Skeleton3D = base.find_child("*", true, false) as Skeleton3D
-	skel = base.find_children("*", "Skeleton3D", true, false)[0]
-	if parts.size() > 1:
-		# Keep only the head of the base body; the outfit pieces are the body.
-		for mi in skel.get_children():
-			if mi is MeshInstance3D and String(mi.name).to_lower().begins_with("superhero"):
-				mi.mesh = head_only(mi.mesh, mi.skin)
-	for i in range(1, parts.size()):
-		var piece: Node = (load(Q + parts[i] + ".gltf") as PackedScene).instantiate()
-		for mi in piece.find_children("*", "MeshInstance3D", true, false):
-			mi.owner = null
-			mi.get_parent().remove_child(mi)
-			skel.add_child(mi)
-			mi.skeleton = NodePath("..")
-		piece.free()
-	return base
-
-
-## Returns a copy of a skinned mesh with only the triangles that move with the
-## head or neck bones (everything below the neck is removed).
-static func head_only(mesh: Mesh, skin: Skin) -> ArrayMesh:
-	var keep_bones := {}
-	for i in skin.get_bind_count():
-		if String(skin.get_bind_name(i)) in ["Head", "neck_01"]:
-			keep_bones[i] = true
-	var out := ArrayMesh.new()
-	for s in mesh.get_surface_count():
-		var arrays := mesh.surface_get_arrays(s)
-		var bones: PackedInt32Array = arrays[Mesh.ARRAY_BONES]
-		var weights: PackedFloat32Array = arrays[Mesh.ARRAY_WEIGHTS]
-		var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
-		var per := bones.size() / verts.size()  # 4 or 8 bone influences per vertex
-		var head_vert := PackedByteArray()
-		head_vert.resize(verts.size())
-		for v in verts.size():
-			var best := 0
-			for k in range(1, per):
-				if weights[v * per + k] > weights[v * per + best]:
-					best = k
-			head_vert[v] = 1 if keep_bones.has(bones[v * per + best]) else 0
-		var idx := PackedInt32Array()
-		if arrays[Mesh.ARRAY_INDEX] != null:
-			idx = arrays[Mesh.ARRAY_INDEX]
-		if idx.is_empty():  # some meshes list triangles directly, without an index
-			for v in verts.size():
-				idx.append(v)
-		var new_idx := PackedInt32Array()
-		for t in range(0, idx.size(), 3):
-			if head_vert[idx[t]] and head_vert[idx[t + 1]] and head_vert[idx[t + 2]]:
-				new_idx.append(idx[t])
-				new_idx.append(idx[t + 1])
-				new_idx.append(idx[t + 2])
-		if new_idx.is_empty():
-			continue
-		arrays[Mesh.ARRAY_INDEX] = new_idx
-		for ch in [Mesh.ARRAY_CUSTOM0, Mesh.ARRAY_CUSTOM1, Mesh.ARRAY_CUSTOM2, Mesh.ARRAY_CUSTOM3]:
-			arrays[ch] = null  # extra data channels the game doesn't use
-		var flags: int = mesh.surface_get_format(s)
-		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays, [], {}, flags & Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS)
-		out.surface_set_material(out.get_surface_count() - 1, mesh.surface_get_material(s))
-	return out
+	var paths: Array = parts.map(func(n): return Q + n + ".gltf")
+	return ModularBody.assemble(paths[0], paths.slice(1))

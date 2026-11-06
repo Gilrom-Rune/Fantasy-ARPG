@@ -45,7 +45,7 @@
 				"text": "+{0} to Armour"
 			}
 		],
-		"model": "knight"
+		"model": "q_warrior"
 	},
 	"ranger": {
 		"name": "Ranger",
@@ -97,7 +97,7 @@
 				"text": "{0}% increased Projectile Damage"
 			}
 		],
-		"model": "ranger"
+		"model": "q_ranger"
 	},
 	"mage": {
 		"name": "Mage",
@@ -155,7 +155,7 @@
 				"per_level": 0.8
 			}
 		],
-		"model": "mage"
+		"model": "q_mage"
 	},
 	"rogue": {
 		"name": "Rogue",
@@ -211,6 +211,6 @@
 				"text": "{0}% increased Attack Speed"
 			}
 		],
-		"model": "rogue"
+		"model": "q_rogue"
 	}
 }

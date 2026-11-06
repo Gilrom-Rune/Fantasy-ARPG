@@ -93,6 +93,8 @@ func _preview(model_id: String) -> Control:
 	var cam := Camera3D.new()
 	cam.fov = 35
 	vp.add_child(cam)
-	var eye := Vector3(-0.9, 1.5, -3.6)
-	cam.transform = Transform3D(Basis.looking_at(Vector3(0, 0.95, 0) - eye, Vector3.UP), eye)
+	var d := DB.model(model_id)
+	var eye := PortraitCamera._vec(d.get("preview_eye", []), Vector3(-0.9, 1.5, -3.6))
+	var look := PortraitCamera._vec(d.get("preview_look", []), Vector3(0, 0.95, 0))
+	cam.transform = Transform3D(Basis.looking_at(look - eye, Vector3.UP), eye)
 	return box

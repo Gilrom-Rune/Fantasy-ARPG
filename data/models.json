@@ -2,7 +2,9 @@
 	"knight": {
 		"file": "res://assets/characters/Knight.glb",
 		"scale": 0.82,
-		"keep_weapons": ["2H_Sword"],
+		"keep_weapons": [
+			"2H_Sword"
+		],
 		"idle": "2H_Melee_Idle",
 		"run": "Running_A",
 		"death": "Death_A",
@@ -17,7 +19,9 @@
 	"ranger": {
 		"file": "res://assets/characters/Rogue_Hooded.glb",
 		"scale": 0.82,
-		"keep_weapons": ["2H_Crossbow"],
+		"keep_weapons": [
+			"2H_Crossbow"
+		],
 		"idle": "Idle",
 		"run": "Running_A",
 		"death": "Death_A",
@@ -32,7 +36,9 @@
 	"mage": {
 		"file": "res://assets/characters/Mage.glb",
 		"scale": 0.82,
-		"keep_weapons": ["2H_Staff"],
+		"keep_weapons": [
+			"2H_Staff"
+		],
 		"idle": "Idle",
 		"run": "Running_A",
 		"death": "Death_A",
@@ -47,7 +53,10 @@
 	"rogue": {
 		"file": "res://assets/characters/Rogue.glb",
 		"scale": 0.82,
-		"keep_weapons": ["Knife", "Knife_Offhand"],
+		"keep_weapons": [
+			"Knife",
+			"Knife_Offhand"
+		],
 		"idle": "Idle",
 		"run": "Running_A",
 		"death": "Death_A",
@@ -62,22 +71,37 @@
 	"skeleton_warrior": {
 		"file": "res://assets/characters/Skeleton_Warrior.glb",
 		"scale": 0.82,
-		"attach": [{"bone": "handslot.r", "file": "res://assets/weapons/Skeleton_Axe.gltf"}],
+		"attach": [
+			{
+				"bone": "handslot.r",
+				"file": "res://assets/weapons/Skeleton_Axe.gltf"
+			}
+		],
 		"idle": "Idle_Combat",
 		"run": "Running_A",
 		"run_speed": 4.5,
 		"death": "Death_C_Skeletons",
-		"actions": {"melee": "1H_Melee_Attack_Chop"}
+		"actions": {
+			"melee": "1H_Melee_Attack_Chop"
+		}
 	},
 	"skeleton_mage": {
 		"file": "res://assets/characters/Skeleton_Mage.glb",
 		"scale": 0.82,
-		"attach": [{"bone": "handslot.r", "file": "res://assets/weapons/Skeleton_Staff.gltf"}],
+		"attach": [
+			{
+				"bone": "handslot.r",
+				"file": "res://assets/weapons/Skeleton_Staff.gltf"
+			}
+		],
 		"idle": "Idle",
 		"run": "Walking_A",
 		"run_speed": 2.5,
 		"death": "Death_C_Skeletons",
-		"actions": {"melee": "1H_Melee_Attack_Chop", "spell": "Spellcast_Shoot"}
+		"actions": {
+			"melee": "1H_Melee_Attack_Chop",
+			"spell": "Spellcast_Shoot"
+		}
 	},
 	"skeleton_minion": {
 		"file": "res://assets/characters/Skeleton_Minion.glb",
@@ -86,6 +110,197 @@
 		"run": "Running_C",
 		"run_speed": 5.0,
 		"death": "Death_C_Skeletons",
-		"actions": {"melee": "Unarmed_Melee_Attack_Punch_A"}
+		"actions": {
+			"melee": "Unarmed_Melee_Attack_Punch_A"
+		}
+	},
+	"q_warrior": {
+		"file": "res://assets/characters/Knight.glb",
+		"scale": 1.15,
+		"keep_weapons": [
+			"2H_Sword"
+		],
+		"idle": "2H_Melee_Idle",
+		"run": "Running_A",
+		"death": "Death_A",
+		"actions": {
+			"melee": "2H_Melee_Attack_Slice",
+			"nova": "2H_Melee_Attack_Spin",
+			"ranged": "1H_Ranged_Shoot",
+			"spell": "Spellcast_Shoot",
+			"spell_nova": "Spellcast_Raise"
+		},
+		"body_scale": 1.0,
+		"weapon_scale": 0.55,
+		"parts": [
+			"res://assets/quaternius/Superhero_Male_FullBody.gltf",
+			"res://assets/quaternius/Male_Peasant_Body.gltf",
+			"res://assets/quaternius/Male_Peasant_Arms.gltf",
+			"res://assets/quaternius/Male_Peasant_Legs.gltf",
+			"res://assets/quaternius/Male_Peasant_Feet.gltf"
+		],
+		"portrait_eye": [
+			-0.48,
+			1.93,
+			-1.15
+		],
+		"portrait_look": [
+			0.0,
+			1.85,
+			0.0
+		],
+		"preview_eye": [
+			-0.85,
+			1.3,
+			-2.75
+		],
+		"preview_look": [
+			0.0,
+			0.98,
+			0.0
+		]
+	},
+	"q_ranger": {
+		"file": "res://assets/characters/Rogue_Hooded.glb",
+		"scale": 1.15,
+		"keep_weapons": [
+			"2H_Crossbow"
+		],
+		"idle": "Idle",
+		"run": "Running_A",
+		"death": "Death_A",
+		"actions": {
+			"melee": "1H_Melee_Attack_Chop",
+			"nova": "2H_Melee_Attack_Spin",
+			"ranged": "2H_Ranged_Shoot",
+			"spell": "Spellcast_Shoot",
+			"spell_nova": "Spellcast_Raise"
+		},
+		"body_scale": 1.0,
+		"weapon_scale": 0.55,
+		"parts": [
+			"res://assets/quaternius/Superhero_Male_FullBody.gltf",
+			"res://assets/quaternius/Male_Ranger_Body.gltf",
+			"res://assets/quaternius/Male_Ranger_Arms.gltf",
+			"res://assets/quaternius/Male_Ranger_Legs.gltf",
+			"res://assets/quaternius/Male_Ranger_Feet_Boots.gltf",
+			"res://assets/quaternius/Male_Ranger_Head_Hood.gltf",
+			"res://assets/quaternius/Male_Ranger_Acc_Pauldron.gltf"
+		],
+		"portrait_eye": [
+			-0.48,
+			1.93,
+			-1.15
+		],
+		"portrait_look": [
+			0.0,
+			1.85,
+			0.0
+		],
+		"preview_eye": [
+			-0.85,
+			1.3,
+			-2.75
+		],
+		"preview_look": [
+			0.0,
+			0.98,
+			0.0
+		]
+	},
+	"q_mage": {
+		"file": "res://assets/characters/Mage.glb",
+		"scale": 1.15,
+		"keep_weapons": [
+			"2H_Staff"
+		],
+		"idle": "Idle",
+		"run": "Running_A",
+		"death": "Death_A",
+		"actions": {
+			"melee": "2H_Melee_Attack_Chop",
+			"nova": "2H_Melee_Attack_Spin",
+			"ranged": "Spellcast_Shoot",
+			"spell": "Spellcast_Shoot",
+			"spell_nova": "Spellcast_Raise"
+		},
+		"body_scale": 1.0,
+		"weapon_scale": 0.55,
+		"parts": [
+			"res://assets/quaternius/Superhero_Female_FullBody.gltf",
+			"res://assets/quaternius/Female_Peasant_Body.gltf",
+			"res://assets/quaternius/Female_Peasant_Arms.gltf",
+			"res://assets/quaternius/Female_Peasant_Legs.gltf",
+			"res://assets/quaternius/Female_Peasant_Feet.gltf"
+		],
+		"portrait_eye": [
+			-0.45,
+			1.83,
+			-1.1
+		],
+		"portrait_look": [
+			0.0,
+			1.75,
+			0.0
+		],
+		"preview_eye": [
+			-0.85,
+			1.3,
+			-2.75
+		],
+		"preview_look": [
+			0.0,
+			0.98,
+			0.0
+		]
+	},
+	"q_rogue": {
+		"file": "res://assets/characters/Rogue.glb",
+		"scale": 1.15,
+		"keep_weapons": [
+			"Knife",
+			"Knife_Offhand"
+		],
+		"idle": "Idle",
+		"run": "Running_A",
+		"death": "Death_A",
+		"actions": {
+			"melee": "Dualwield_Melee_Attack_Chop",
+			"nova": "2H_Melee_Attack_Spin",
+			"ranged": "Throw",
+			"spell": "Spellcast_Shoot",
+			"spell_nova": "Spellcast_Raise"
+		},
+		"body_scale": 1.0,
+		"weapon_scale": 0.55,
+		"parts": [
+			"res://assets/quaternius/Superhero_Female_FullBody.gltf",
+			"res://assets/quaternius/Female_Ranger_Body.gltf",
+			"res://assets/quaternius/Female_Ranger_Arms.gltf",
+			"res://assets/quaternius/Female_Ranger_Legs.gltf",
+			"res://assets/quaternius/Female_Ranger_Feet.gltf",
+			"res://assets/quaternius/Female_Ranger_Head_Hood.gltf",
+			"res://assets/quaternius/Female_Ranger_Acc_Pauldrons.gltf"
+		],
+		"portrait_eye": [
+			-0.45,
+			1.83,
+			-1.1
+		],
+		"portrait_look": [
+			0.0,
+			1.75,
+			0.0
+		],
+		"preview_eye": [
+			-0.85,
+			1.3,
+			-2.75
+		],
+		"preview_look": [
+			0.0,
+			0.98,
+			0.0
+		]
 	}
 }

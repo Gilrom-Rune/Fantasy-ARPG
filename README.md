@@ -2,7 +2,7 @@
 
 An ARPG set in a fantasy world with 4 main classes and a subclass. It will have a versatile skill tree and a unique weapon system.
 
-> **Current state: playable prototype.** Pick one of 4 classes, fight endless monster waves in an arena, and build your class weapon at the Enchanter's Table. Characters and monsters are animated low-poly fantasy models; the arena itself is still placeholder shapes.
+> **Current state: playable prototype.** Pick one of 4 classes, fight endless monster waves in an arena, and build your class weapon at the Enchanter's Table. Heroes are Quaternius fantasy models, monsters are KayKit skeletons; the arena itself is still placeholder shapes.
 
 ## How to play it
 
@@ -110,4 +110,6 @@ The first command runs unit tests for the stat math, passives, weapon slots, Sou
 
 Fonts: **Cinzel** (titles) and **Alegreya Sans** (text), both under the SIL Open Font License. Licenses are in `assets/fonts/`.
 
-Character and monster models and animations: **KayKit Adventurers** and **KayKit Skeletons** character packs by **Kay Lousberg** ([kaylousberg.com](https://www.kaylousberg.com)), licensed CC0 (public domain). Free to use, including commercially. Licenses are in `assets/`.
+Hero models: **Quaternius** Modular Character Outfits – Fantasy and Universal Base Characters ([quaternius.com](https://quaternius.com)).
+
+Monster models, weapons and animations: **KayKit Adventurers** and **KayKit Skeletons** character packs by **Kay Lousberg** ([kaylousberg.com](https://www.kaylousberg.com)), licensed CC0 (public domain). Free to use, including commercially. Licenses are in `assets/`.

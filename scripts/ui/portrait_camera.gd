@@ -42,10 +42,13 @@ static func render(owner_node: Node, model_id: String, pixels: int = 256) -> Tex
 	var model := CharacterModel.create(model_id)
 	if model:
 		vp.add_child(model)
+	var d := DB.model(model_id)
+	var eye := _vec(d.get("portrait_eye", []), EYE)
+	var look := _vec(d.get("portrait_look", []), LOOK)
 	var cam := Camera3D.new()
 	cam.fov = 30
 	vp.add_child(cam)
-	cam.transform = Transform3D(Basis.looking_at(LOOK - EYE, Vector3.UP), EYE)
+	cam.transform = Transform3D(Basis.looking_at(look - eye, Vector3.UP), eye)
 
 	# Let the idle pose settle, then freeze it and stop re-rendering (it's a still image).
 	_freeze_later(vp, model)
@@ -63,3 +66,7 @@ static func _freeze_later(vp: SubViewport, model: CharacterModel) -> void:
 	if is_instance_valid(model) and model.anim:
 		model.anim.pause()
 	vp.render_target_update_mode = SubViewport.UPDATE_ONCE
+
+
+static func _vec(a: Array, fallback: Vector3) -> Vector3:
+	return Vector3(a[0], a[1], a[2]) if a.size() == 3 else fallback

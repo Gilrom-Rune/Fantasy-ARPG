@@ -27,14 +27,14 @@ static func create(model_id: String) -> CharacterModel:
 	return m
 
 
-static func _load_scene(path: String) -> PackedScene:
+static func load_scene(path: String) -> PackedScene:
 	if not _cache.has(path):
 		_cache[path] = load(path)
 	return _cache[path]
 
 
 func _ready() -> void:
-	var packed := _load_scene(def["file"])
+	var packed := load_scene(def["file"])
 	if packed == null:
 		push_error("Could not load model " + String(def["file"]))
 		return
@@ -53,7 +53,7 @@ func _ready() -> void:
 	# Attach extra weapons (e.g. an axe for skeleton warriors).
 	var skel: Skeleton3D = inst.find_child("Skeleton3D", true, false)
 	for a in def.get("attach", []):
-		var weapon_scene := _load_scene(a["file"])
+		var weapon_scene := load_scene(a["file"])
 		if skel == null or weapon_scene == null:
 			continue
 		var ba := BoneAttachment3D.new()
@@ -61,12 +61,19 @@ func _ready() -> void:
 		skel.add_child(ba)
 		ba.add_child(weapon_scene.instantiate())
 
+	# Modular (Quaternius) characters: the model in "file" is only used as an
+	# invisible puppet that plays the animations; the visible body is built from
+	# the outfit pieces and copies the puppet's pose every frame.
+	var visible_root: Node3D = inst
+	if def.has("parts"):
+		visible_root = _build_modular(inst, skel)
+
 	# One shared see-through overlay material for tints.
 	_overlay = StandardMaterial3D.new()
 	_overlay.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_overlay.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_overlay.albedo_color = Color(0, 0, 0, 0)
-	for mi in inst.find_children("*", "MeshInstance3D", true, false):
+	for mi in visible_root.find_children("*", "MeshInstance3D", true, false):
 		mi.material_overlay = _overlay
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 
@@ -76,6 +83,50 @@ func _ready() -> void:
 			if anim.has_animation(loop_name):
 				anim.get_animation(loop_name).loop_mode = Animation.LOOP_LINEAR
 		anim.play(def.get("idle", "Idle"))
+
+
+## Builds the visible Quaternius body, hides the puppet, moves the puppet's
+## weapons into the new body's hand, and starts copying the pose across.
+func _build_modular(puppet: Node3D, puppet_skel: Skeleton3D) -> Node3D:
+	var parts: Array = def["parts"]
+	var body := ModularBody.assemble(parts[0], parts.slice(1))
+	body.rotation.y = PI
+	body.scale = Vector3.ONE * float(def.get("body_scale", 1.0))
+	add_child(body)
+	var body_skel: Skeleton3D = body.find_children("*", "Skeleton3D", true, false)[0]
+
+	# Weapons: keep their grip relative to the hand exactly as on the puppet.
+	var keep: Array = def.get("keep_weapons", [])
+	for att in puppet.find_children("handslot*", "BoneAttachment3D", true, false):
+		var src_slot := puppet_skel.find_bone(String(att.bone_name))
+		var src_hand := puppet_skel.get_bone_parent(puppet_skel.get_bone_parent(src_slot))  # handslot -> hand -> wrist
+		var side := "l" if String(att.bone_name).ends_with(".l") else "r"
+		var dst_hand := body_skel.find_bone("hand_" + side)
+		if src_hand < 0 or dst_hand < 0:
+			continue
+		for c in att.get_children():
+			if not (c is MeshInstance3D and keep.has(String(c.name))):
+				continue
+			var weapon: MeshInstance3D = c
+			var rel := puppet_skel.get_bone_global_rest(src_hand).affine_inverse() \
+				* puppet_skel.get_bone_global_rest(src_slot) * weapon.transform
+			var ba := BoneAttachment3D.new()
+			ba.bone_name = "hand_" + side
+			body_skel.add_child(ba)
+			var offset := Node3D.new()  # turns the new hand's axes into the puppet's
+			offset.basis = Basis(body_skel.get_bone_global_rest(dst_hand).basis.get_rotation_quaternion().inverse() \
+				* puppet_skel.get_bone_global_rest(src_hand).basis.get_rotation_quaternion())
+			offset.scale = Vector3.ONE * float(def.get("weapon_scale", 1.0))
+			ba.add_child(offset)
+			att.remove_child(weapon)
+			offset.add_child(weapon)
+			weapon.transform = rel
+
+	puppet.visible = false
+	var retarget := AnimRetarget.new()
+	add_child(retarget)
+	retarget.setup(puppet_skel, body_skel)
+	return body
 
 
 ## Called every physics frame by the actor.
