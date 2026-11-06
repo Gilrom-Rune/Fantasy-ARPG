@@ -7,7 +7,7 @@ var _list: VBoxContainer
 
 
 func _ready() -> void:
-	color = Color(0, 0, 0, 0.55)
+	color = Color(0, 0, 0, 0.6)
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	visible = false
 	var center := CenterContainer.new()
@@ -15,12 +15,13 @@ func _ready() -> void:
 	add_child(center)
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(480, 0)
-	panel.add_theme_stylebox_override("panel", UiUtil.box(Color(0.09, 0.09, 0.12), Color(0.6, 0.5, 0.3), 6, 14))
+	panel.add_theme_stylebox_override("panel", UiTheme.window(16))
 	center.add_child(panel)
 	var v := VBoxContainer.new()
 	panel.add_child(v)
-	_title = UiUtil.header("")
+	_title = UiUtil.title("", 22)
 	v.add_child(_title)
+	v.add_child(HSeparator.new())
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(460, 420)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -28,7 +29,9 @@ func _ready() -> void:
 	_list = VBoxContainer.new()
 	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(_list)
-	v.add_child(UiUtil.button("Cancel", close))
+	var cancel := UiUtil.button("Cancel", close)
+	cancel.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(cancel)
 
 
 func close() -> void:
@@ -48,5 +51,5 @@ func open(title: String, options: Array) -> void:
 		b.disabled = o.get("disabled", false)
 		_list.add_child(b)
 	if options.is_empty():
-		_list.add_child(UiUtil.label("Nothing available. Find more gems from monsters and chests.", 15, Color(0.6, 0.6, 0.6)))
+		_list.add_child(UiUtil.hint("Nothing available. Find more gems from monsters and chests."))
 	visible = true

@@ -7,10 +7,10 @@ extends Control
 ##  - Uncut gems are cut here too.
 ## The game is paused while it is open.
 
-const SKILL_COLOR := Color(0.5, 1.0, 0.6)
-const PASSIVE_COLOR := Color(0.55, 0.8, 1.0)
-const LOCKED_COLOR := Color(0.4, 0.4, 0.42)
-const HINT_COLOR := Color(0.6, 0.6, 0.6)
+const SKILL_COLOR := UiTheme.SKILL
+const PASSIVE_COLOR := UiTheme.PASSIVE
+const LOCKED_COLOR := UiTheme.FAINT
+const HINT_COLOR := UiTheme.MUTED
 
 var player: Player
 var nodes: Array = []  ## chain node buttons, one per slot (index = slot)
@@ -33,29 +33,10 @@ func setup(p: Player) -> void:
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0.03, 0.55)
-	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(dim)
-
-	var panel := PanelContainer.new()
-	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	panel.offset_left = 50
-	panel.offset_top = 30
-	panel.offset_right = -50
-	panel.offset_bottom = -30
-	panel.add_theme_stylebox_override("panel", UiUtil.box(Color(0.05, 0.06, 0.09, 0.97), Color(0.4, 0.6, 0.85), 6, 14))
-	add_child(panel)
-
-	var root := VBoxContainer.new()
-	root.add_theme_constant_override("separation", 8)
-	panel.add_child(root)
-	var top := HBoxContainer.new()
-	_title = UiUtil.label("Enchanter's Table", 22, Color(0.65, 0.85, 1.0))
-	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	top.add_child(_title)
-	top.add_child(UiUtil.button("Close (Esc)", func(): Game.hud.close_menus()))
-	root.add_child(top)
+	var w := UiUtil.window("Enchanter's Table", "Close  (Esc)", func(): Game.hud.close_menus())
+	add_child(w["root"])
+	_title = w["title"]
+	var root: VBoxContainer = w["body"]
 
 	var body := HBoxContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -67,7 +48,7 @@ func _ready() -> void:
 	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	left.size_flags_stretch_ratio = 1.8
 	body.add_child(left)
-	_weapon_label = UiUtil.label("", 14, Color(0.85, 0.85, 0.85))
+	_weapon_label = UiUtil.label("", 15, Color(1.0, 0.8, 0.55))
 	left.add_child(_weapon_label)
 	left.add_child(HSeparator.new())
 	var hint := UiUtil.label("Each slot holds an ACTIVE skill gem and a PASSIVE gem that modifies it.\n" \
@@ -122,13 +103,13 @@ func _build_slot_row(i: int, unlocked: bool) -> Control:
 	var inv := player.inv
 	var slot: Dictionary = inv.weapon.slots[i]
 	var box := PanelContainer.new()
-	var border := Color(0.3, 0.4, 0.55) if unlocked else Color(0.2, 0.2, 0.22)
-	box.add_theme_stylebox_override("panel", UiUtil.box(Color(0.08, 0.09, 0.12), border, 4, 4))
+	var border := UiTheme.GOLD_DIM if unlocked else Color(0.22, 0.2, 0.18)
+	box.add_theme_stylebox_override("panel", UiTheme.box(border, 5))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	box.add_child(row)
 
-	var key := UiUtil.label(Player.SLOT_KEYS[i], 14, Color(0.95, 0.8, 0.5) if unlocked else LOCKED_COLOR)
+	var key := UiUtil.label(Player.SLOT_KEYS[i], 14, UiTheme.TITLE if unlocked else LOCKED_COLOR)
 	key.custom_minimum_size = Vector2(38, 0)
 	row.add_child(key)
 
@@ -163,7 +144,7 @@ func _build_slot_row(i: int, unlocked: bool) -> Control:
 		passive.disabled = gem == null
 		row.add_child(passive)
 
-		var shared := UiUtil.label(_shared_text(i), 12, Color(0.6, 0.85, 1.0))
+		var shared := UiUtil.label(_shared_text(i), 13, UiTheme.SOUL)
 		shared.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		shared.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(shared)
@@ -182,7 +163,7 @@ func _build_slot_row(i: int, unlocked: bool) -> Control:
 
 func _style_node(node: Button, color: Color) -> void:
 	for state in ["normal", "hover", "pressed", "disabled"]:
-		var s := UiUtil.box(color if state != "hover" else color.lightened(0.3), Color(1, 1, 1, 0.5), 13, 0)
+		var s := UiTheme.flat(color if state != "hover" else color.lightened(0.3), UiTheme.GOLD, 2, 13, 0)
 		node.add_theme_stylebox_override(state, s)
 	node.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 

@@ -34,6 +34,7 @@ var _deaths := 0
 
 func _ready() -> void:
 	DB.ensure_loaded()
+	UiTheme.apply()
 	Game.reset()
 	Game.world = self
 	_setup_input()

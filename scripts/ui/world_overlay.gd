@@ -19,7 +19,7 @@ func _draw() -> void:
 	var cam := get_viewport().get_camera_3d()
 	if cam == null:
 		return
-	var font := ThemeDB.fallback_font
+	var font := UiTheme.bold_font()
 
 	# Loot labels
 	for drop in get_tree().get_nodes_in_group("loot"):

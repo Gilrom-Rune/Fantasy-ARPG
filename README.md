@@ -89,7 +89,8 @@ scripts/
   entities/       actor (shared combat logic), player, enemy
   items/          class weapon (slots + Soul Chains), items, item generation, inventory
   world/          loot drops, chests, the Enchanter's Table
-  ui/             HUD, inventory, Enchanter's Table window, class select, damage numbers
+  ui/             ui_theme.gd (colours, fonts, styles for every screen), HUD portrait +
+                  crescent bars, skill bar, inventory, Enchanter's Table, class select
   main.gd         builds the arena, spawns monsters
 assets/           3D models (characters, weapons) and their licenses
 tests/            automated tests
@@ -106,5 +107,7 @@ godot --headless --fixed-fps 60 --path . -- --autoplay --class=mage --level=35 -
 The first command runs unit tests for the stat math, passives, weapon slots, Soul Chains, items and inventory. The others let a bot play the game for 90 seconds and prints a summary, which catches crashes and script errors.
 
 ## Credits
+
+Fonts: **Cinzel** (titles) and **Alegreya Sans** (text), both under the SIL Open Font License. Licenses are in `assets/fonts/`.
 
 Character and monster models and animations: **KayKit Adventurers** and **KayKit Skeletons** character packs by **Kay Lousberg** ([kaylousberg.com](https://www.kaylousberg.com)), licensed CC0 (public domain). Free to use, including commercially. Licenses are in `assets/`.

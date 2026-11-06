@@ -16,30 +16,13 @@ func setup(p: Player) -> void:
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.45)
-	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(dim)
-
-	var panel := PanelContainer.new()
-	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	panel.offset_left = 50
-	panel.offset_top = 40
-	panel.offset_right = -50
-	panel.offset_bottom = -40
-	panel.add_theme_stylebox_override("panel", UiUtil.box(Color(0.07, 0.07, 0.09, 0.97), Color(0.5, 0.42, 0.28), 6, 14))
-	add_child(panel)
-
-	var root := VBoxContainer.new()
-	root.add_theme_constant_override("separation", 10)
-	panel.add_child(root)
-	var top := HBoxContainer.new()
-	var title := UiUtil.label("Inventory", 22, Color(0.95, 0.8, 0.5))
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	top.add_child(title)
-	top.add_child(UiUtil.label("Hover anything for details   ", 13, Color(0.6, 0.6, 0.6)))
-	top.add_child(UiUtil.button("Close (I)", func(): Game.hud.close_menus()))
-	root.add_child(top)
+	var w := UiUtil.window("Inventory", "Close  (I)", func(): Game.hud.close_menus())
+	add_child(w["root"])
+	var hover_hint := UiUtil.hint("Hover anything for details   ")
+	hover_hint.autowrap_mode = TextServer.AUTOWRAP_OFF
+	w["top"].add_child(hover_hint)
+	w["top"].move_child(hover_hint, 1)
+	var root: VBoxContainer = w["body"]
 
 	var body := HBoxContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -78,14 +61,14 @@ func refresh() -> void:
 func _build_equipment(col: VBoxContainer) -> void:
 	var inv := player.inv
 	col.add_child(UiUtil.header("Weapon"))
-	var w := UiUtil.label(inv.weapon.describe(player.level), 14, Color(1.0, 0.75, 0.45))
+	var w := UiUtil.label(inv.weapon.describe(player.level), 14, Color(1.0, 0.78, 0.5))
 	w.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(w)
 	col.add_child(UiUtil.header("Equipment"))
-	col.add_child(UiUtil.label("Click an item to take it off.", 12, Color(0.6, 0.6, 0.6)))
+	col.add_child(UiUtil.label("Click an item to take it off.", 12, UiTheme.MUTED))
 	for slot in DB.SLOTS:
 		var row := HBoxContainer.new()
-		var l := UiUtil.label(slot.capitalize(), 14, Color(0.7, 0.7, 0.7))
+		var l := UiUtil.label(slot.capitalize(), 14, UiTheme.MUTED)
 		l.custom_minimum_size = Vector2(70, 0)
 		row.add_child(l)
 		var item: Item = inv.equipment[slot]
@@ -93,7 +76,7 @@ func _build_equipment(col: VBoxContainer) -> void:
 		if item:
 			b = UiUtil.button(item.name, func(): inv.unequip(slot), item.color(), item.tooltip())
 		else:
-			b = UiUtil.button("(empty)", func(): pass, Color(0.45, 0.45, 0.45))
+			b = UiUtil.button("(empty)", func(): pass, UiTheme.FAINT)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(b)
 		col.add_child(row)
@@ -117,7 +100,7 @@ func _build_equipment(col: VBoxContainer) -> void:
 func _build_bag(col: VBoxContainer) -> void:
 	var inv := player.inv
 	col.add_child(UiUtil.header("Bag  (%d / %d)" % [inv.bag.size(), Inventory.BAG_SIZE]))
-	col.add_child(UiUtil.label("Click: equip    Right-click: destroy", 12, Color(0.6, 0.6, 0.6)))
+	col.add_child(UiUtil.label("Click: equip    Right-click: destroy", 12, UiTheme.MUTED))
 	for i in inv.bag.size():
 		var item: Item = inv.bag[i]
 		var tip := item.tooltip()
@@ -130,14 +113,14 @@ func _build_bag(col: VBoxContainer) -> void:
 				inv.discard(i))
 		col.add_child(b)
 	if inv.bag.is_empty():
-		col.add_child(UiUtil.label("Kill monsters and open chests to find items.", 14, Color(0.55, 0.55, 0.55)))
+		col.add_child(UiUtil.label("Kill monsters and open chests to find items.", 14, UiTheme.FAINT))
 
 
 # --- Column 3: gem pouch (read only) ---------------------------------------------------
 func _build_pouch(col: VBoxContainer) -> void:
 	var inv := player.inv
 	col.add_child(UiUtil.header("Gem Pouch"))
-	var note := UiUtil.label("Cut gems and set them into your weapon at the Enchanter's Table in camp (walk up to it and press F).", 13, Color(0.6, 0.8, 1.0))
+	var note := UiUtil.label("Cut gems and set them into your weapon at the Enchanter's Table in camp (walk up to it and press F).", 13, UiTheme.SOUL)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(note)
 	col.add_child(UiUtil.label("Uncut gems: %d" % inv.uncut.size(), 14))
@@ -156,4 +139,4 @@ func _build_pouch(col: VBoxContainer) -> void:
 			text += "  +  " + String(DB.support(slot["passive"]).get("name", ""))
 		col.add_child(UiUtil.label(text, 14))
 	if open < Weapon.MAX_SLOTS:
-		col.add_child(UiUtil.label("Next slot opens at level %d." % Weapon.unlock_level(open), 13, Color(0.55, 0.55, 0.55)))
+		col.add_child(UiUtil.label("Next slot opens at level %d." % Weapon.unlock_level(open), 13, UiTheme.FAINT))
